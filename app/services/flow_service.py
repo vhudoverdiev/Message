@@ -2,8 +2,8 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
-from app.core.config import settings
-from app.schemas.flow import FlowData
+from core.config import settings
+from schemas.flow import FlowData
 
 
 DEFAULT_FLOW = {

@@ -56,8 +56,10 @@ pip install -r requirements.txt
 ### 4. Запусти сервер
 
 ```bash
-uvicorn app.main:app --reload
+python app.py
 ```
+
+(Альтернатива: `uvicorn main:app --app-dir app --reload`)
 
 ### 5. Открой в браузере
 
