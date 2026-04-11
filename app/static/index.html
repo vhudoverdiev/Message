@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Message</title>
+  <title>Massage CRM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,133 +12,129 @@
 <body>
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
-      <div class="auth-header">
-        <div class="brand__logo" aria-hidden="true">
-          <svg viewBox="0 0 64 64" role="presentation">
-            <rect x="6" y="10" width="52" height="40" rx="13" ry="13"></rect>
-            <path d="M18 26h28M18 34h19"></path>
-            <circle cx="47" cy="45" r="5"></circle>
-          </svg>
-        </div>
+      <div class="auth-brand">
+        <div class="auth-logo">M</div>
         <div>
-          <h1>Message</h1>
+          <h1>Massage</h1>
           <p>Все сообщения в одном месте.</p>
         </div>
       </div>
 
       <div class="auth-tabs">
-        <button class="auth-tab auth-tab--active" data-tab="login">Вход</button>
-        <button class="auth-tab" data-tab="register">Регистрация</button>
+        <button class="auth-tab auth-tab--active" data-auth-tab="login">Вход</button>
+        <button class="auth-tab" data-auth-tab="register">Регистрация</button>
       </div>
 
-      <form id="loginForm" class="auth-form auth-form--active">
-        <label>Логин</label>
-        <input id="loginUsername" type="text" placeholder="Введите логин" required>
-        <label>Пароль</label>
-        <input id="loginPassword" type="password" placeholder="Введите пароль" required>
-        <button type="submit" class="btn btn--primary">Войти</button>
+      <form class="auth-form auth-form--active" id="loginForm">
+        <label for="login">Логин</label>
+        <input id="login" type="text" required placeholder="Введите логин" />
+        <label for="password">Пароль</label>
+        <input id="password" type="password" required placeholder="Введите пароль" />
+        <button class="btn btn--primary" type="submit">Войти</button>
       </form>
 
-      <form id="registerForm" class="auth-form">
-        <label>Логин</label>
-        <input id="registerUsername" type="text" placeholder="Новый логин" required>
-        <label>Пароль</label>
-        <input id="registerPassword" type="password" placeholder="Новый пароль" required>
-        <button type="submit" class="btn btn--secondary">Зарегистрироваться</button>
+      <form class="auth-form" id="registerForm">
+        <label for="newLogin">Логин</label>
+        <input id="newLogin" type="text" required placeholder="Создайте логин" />
+        <label for="newPassword">Пароль</label>
+        <input id="newPassword" type="password" required minlength="6" placeholder="Не менее 6 символов" />
+        <button class="btn btn--secondary" type="submit">Зарегистрироваться</button>
       </form>
 
-      <small>Тестовый вход: <b>vhudoverdiev</b> / <b>123456</b></small>
+      <small>Тест: <b>admin</b> / <b>123456</b></small>
     </div>
   </div>
 
-  <div class="app-layout" id="appLayout">
+  <div class="layout" id="layout">
     <aside class="sidebar">
       <div>
         <div class="brand">
-          <div class="brand__logo" aria-hidden="true">
-            <svg viewBox="0 0 64 64" role="presentation">
-              <rect x="6" y="10" width="52" height="40" rx="13" ry="13"></rect>
-              <path d="M18 26h28M18 34h19"></path>
-              <circle cx="47" cy="45" r="5"></circle>
-            </svg>
-          </div>
-          <div class="brand__text">
-            <div class="brand__title">Message</div>
-            <div class="brand__subtitle">Все сообщения в одном месте.</div>
+          <div class="brand-logo">M</div>
+          <div>
+            <div class="brand-title">Massage</div>
+            <div class="brand-subtitle">CRM для сообщений VK</div>
           </div>
         </div>
 
-        <nav class="sidebar-nav" aria-label="Разделы">
-          <button class="nav-item nav-item--active" type="button">
-            <span class="nav-icon">💬</span>
-            <span>Сообщения</span>
-          </button>
-          <button class="nav-item" type="button">
-            <span class="nav-icon">📥</span>
-            <span>Входящие</span>
-          </button>
-          <button class="nav-item" type="button">
-            <span class="nav-icon">⭐</span>
-            <span>Избранное</span>
-          </button>
-          <button class="nav-item" id="settingsBtn" type="button">
-            <span class="nav-icon">⚙️</span>
-            <span>Настройки</span>
-          </button>
+        <nav class="menu" aria-label="Главное меню">
+          <button class="menu-item menu-item--active" data-view="messages">💬 Все сообщения</button>
+          <button class="menu-item" data-view="groups">➕ Добавить группу</button>
+          <button class="menu-item" data-view="accounts">🔗 VK аккаунты</button>
+          <button class="menu-item" data-view="settings">⚙️ Настройки аккаунта</button>
         </nav>
       </div>
 
-      <div class="sidebar-footer">
-        <button class="user-card" id="profileBtn" type="button">
-          <div class="user-avatar" id="userAvatar">S</div>
-          <div>
-            <div class="user-name" id="userName">Администратор</div>
-            <div class="user-role">Администратор</div>
-          </div>
-        </button>
+      <div class="profile">
+        <div class="avatar" id="sidebarAvatar">A</div>
+        <div>
+          <div class="profile-name" id="sidebarName">Админ</div>
+          <div class="profile-role">Оператор CRM</div>
+        </div>
       </div>
     </aside>
 
-    <main class="main-content">
-      <h2>Добро пожаловать в Message</h2>
-      <p>Управляйте аккаунтом и персонализацией через блок настроек.</p>
+    <main class="content">
+      <header class="topbar">
+        <input class="search" id="messageSearch" type="search" placeholder="Поиск по сообщениям, группам и аккаунтам" />
+        <div class="topbar-actions">
+          <button class="btn btn--ghost" id="logoutBtn">Выйти</button>
+        </div>
+      </header>
 
-      <section class="settings-panel" id="settingsPanel">
-        <h3>Настройки аккаунта</h3>
+      <section class="view view--active" id="view-messages">
+        <h2>Все сообщения в одном месте</h2>
+        <p>Единая лента сообщений со всех подключенных VK аккаунтов.</p>
+        <div class="card-grid" id="messagesList"></div>
+      </section>
 
+      <section class="view" id="view-groups">
+        <h2>Добавить группу</h2>
+        <p>Создавайте группы для распределения диалогов и операторов.</p>
+        <form id="groupForm" class="panel">
+          <label for="groupName">Название группы</label>
+          <input id="groupName" type="text" required placeholder="Например: Продажи / Поддержка" />
+          <label for="groupDescription">Описание</label>
+          <textarea id="groupDescription" rows="3" placeholder="Кратко опишите назначение группы"></textarea>
+          <button class="btn btn--primary" type="submit">Добавить группу</button>
+        </form>
+        <div class="list" id="groupList"></div>
+      </section>
+
+      <section class="view" id="view-accounts">
+        <h2>Управление VK аккаунтами</h2>
+        <p>Подключайте несколько аккаунтов и управляйте сообщениями из одного интерфейса.</p>
+        <form id="vkForm" class="panel">
+          <label for="vkName">Название аккаунта</label>
+          <input id="vkName" type="text" required placeholder="vk.com/my_company" />
+          <label for="vkToken">Токен / ключ доступа</label>
+          <input id="vkToken" type="text" required placeholder="Введите технический токен" />
+          <button class="btn btn--primary" type="submit">Добавить VK аккаунт</button>
+        </form>
+        <div class="list" id="vkList"></div>
+      </section>
+
+      <section class="view" id="view-settings">
+        <h2>Настройки аккаунта</h2>
+        <p>Управление личным профилем и безопасностью.</p>
         <div class="settings-grid">
-          <div class="settings-block">
-            <h4>Аккаунт</h4>
-            <label>Логин</label>
-            <input id="accountLogin" type="text" readonly>
-          </div>
-
-          <form class="settings-block" id="passwordForm">
-            <h4>Изменение пароля</h4>
-            <label>Новый пароль</label>
-            <input id="newPassword" type="password" minlength="6" required>
-            <button type="submit" class="btn btn--secondary">Сменить пароль</button>
+          <form class="panel" id="profileForm">
+            <h3>Профиль</h3>
+            <label for="displayName">Отображаемое имя</label>
+            <input id="displayName" type="text" placeholder="Ваше имя" required />
+            <label for="about">О себе</label>
+            <textarea id="about" rows="3" placeholder="Роль, отдел, заметки"></textarea>
+            <button class="btn btn--secondary" type="submit">Сохранить профиль</button>
           </form>
 
-          <form class="settings-block" id="descriptionForm">
-            <h4>Описание профиля</h4>
-            <textarea id="profileDescription" rows="4" placeholder="Расскажите о себе"></textarea>
-            <button type="submit" class="btn btn--secondary">Сохранить описание</button>
-          </form>
-
-          <form class="settings-block" id="avatarForm">
-            <h4>Сменить аватар</h4>
-            <input id="avatarInput" type="file" accept="image/*">
-            <div class="avatar-preview" id="avatarPreview">A</div>
-          </form>
-
-          <form class="settings-block" id="twoFactorForm">
-            <h4>Двухэтапная аутентификация</h4>
-            <label class="switch">
-              <input id="twoFactorToggle" type="checkbox">
-              <span>Включить 2FA</span>
+          <form class="panel" id="securityForm">
+            <h3>Безопасность</h3>
+            <label for="newPass">Новый пароль</label>
+            <input id="newPass" type="password" minlength="6" required />
+            <label class="switch-row">
+              <input id="twoFactor" type="checkbox" />
+              <span>Включить двухфакторную аутентификацию</span>
             </label>
-            <button type="submit" class="btn btn--secondary">Сохранить 2FA</button>
+            <button class="btn btn--secondary" type="submit">Обновить безопасность</button>
           </form>
         </div>
       </section>

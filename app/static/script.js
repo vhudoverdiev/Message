@@ -1,221 +1,329 @@
-const DEFAULT_LOGIN = "vhudoverdiev";
-const DEFAULT_PASSWORD = "123456";
+const STORE_KEY = "massage_crm_users";
+const CURRENT_KEY = "massage_crm_current";
+
+const defaultMessages = [
+  { account: "vk.com/shop", from: "Ирина", text: "Здравствуйте, подскажите по доставке?", time: "09:40" },
+  { account: "vk.com/agency", from: "Павел", text: "Есть вопрос по тарифу CRM.", time: "10:15" },
+  { account: "vk.com/brand", from: "Мария", text: "Когда будет обратный звонок?", time: "11:02" },
+];
 
 const authOverlay = document.getElementById("authOverlay");
-const appLayout = document.getElementById("appLayout");
+const layout = document.getElementById("layout");
 const toast = document.getElementById("toast");
 
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
-const authTabs = document.querySelectorAll(".auth-tab");
+const authTabs = document.querySelectorAll("[data-auth-tab]");
+const menuItems = document.querySelectorAll(".menu-item");
 
-const settingsPanel = document.getElementById("settingsPanel");
-const settingsBtn = document.getElementById("settingsBtn");
-const profileBtn = document.getElementById("profileBtn");
+const messagesList = document.getElementById("messagesList");
+const groupForm = document.getElementById("groupForm");
+const groupList = document.getElementById("groupList");
+const vkForm = document.getElementById("vkForm");
+const vkList = document.getElementById("vkList");
+const profileForm = document.getElementById("profileForm");
+const securityForm = document.getElementById("securityForm");
 
-const userName = document.getElementById("userName");
-const userAvatar = document.getElementById("userAvatar");
-const accountLogin = document.getElementById("accountLogin");
+const sidebarName = document.getElementById("sidebarName");
+const sidebarAvatar = document.getElementById("sidebarAvatar");
+const logoutBtn = document.getElementById("logoutBtn");
+const messageSearch = document.getElementById("messageSearch");
 
-const passwordForm = document.getElementById("passwordForm");
-const descriptionForm = document.getElementById("descriptionForm");
-const avatarInput = document.getElementById("avatarInput");
-const avatarPreview = document.getElementById("avatarPreview");
-const twoFactorForm = document.getElementById("twoFactorForm");
-const twoFactorToggle = document.getElementById("twoFactorToggle");
-
-const STORE_KEY = "message_accounts";
-const USER_KEY = "message_current_user";
-
-function showToast(message) {
-  toast.textContent = message;
+function notify(text) {
+  toast.textContent = text;
   toast.classList.add("toast--visible");
   clearTimeout(window.toastTimer);
-  window.toastTimer = setTimeout(() => toast.classList.remove("toast--visible"), 2200);
+  window.toastTimer = setTimeout(() => toast.classList.remove("toast--visible"), 2300);
 }
 
-function getAccounts() {
+function getUsers() {
   const raw = localStorage.getItem(STORE_KEY);
   return raw ? JSON.parse(raw) : {};
 }
 
-function saveAccounts(accounts) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(accounts));
+function saveUsers(users) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(users));
 }
 
-function ensureDefaultUser() {
-  const accounts = getAccounts();
-  if (!accounts[DEFAULT_LOGIN]) {
-    accounts[DEFAULT_LOGIN] = {
-      password: DEFAULT_PASSWORD,
-      description: "",
-      avatar: "",
+function currentUserLogin() {
+  return localStorage.getItem(CURRENT_KEY);
+}
+
+function ensureDefaults() {
+  const users = getUsers();
+  if (!users.admin) {
+    users.admin = {
+      password: "123456",
+      displayName: "Администратор",
+      about: "Главный оператор",
       twoFactor: false,
+      groups: [
+        { name: "Продажи", description: "Диалоги по новым заявкам" },
+        { name: "Поддержка", description: "Помощь клиентам" },
+      ],
+      vkAccounts: [
+        { name: "vk.com/shop", token: "***" },
+        { name: "vk.com/agency", token: "***" },
+      ],
+      messages: defaultMessages,
     };
-    saveAccounts(accounts);
   }
+  saveUsers(users);
 }
 
-function setCurrentUser(login) {
-  localStorage.setItem(USER_KEY, login);
-  renderUser();
+function openApp(login) {
+  localStorage.setItem(CURRENT_KEY, login);
+  authOverlay.classList.add("auth-overlay--hidden");
+  layout.style.filter = "none";
+  render();
 }
 
-function getCurrentUser() {
-  return localStorage.getItem(USER_KEY);
+function closeApp() {
+  localStorage.removeItem(CURRENT_KEY);
+  authOverlay.classList.remove("auth-overlay--hidden");
+  layout.style.filter = "blur(5px)";
 }
 
-function renderUser() {
-  const login = getCurrentUser();
-  const accounts = getAccounts();
-  if (!login || !accounts[login]) {
-    authOverlay.classList.remove("auth-overlay--hidden");
-    appLayout.style.filter = "blur(4px)";
+function renderMessages(items) {
+  messagesList.innerHTML = "";
+  if (!items.length) {
+    messagesList.innerHTML = '<div class="panel">Сообщений пока нет.</div>';
     return;
   }
 
-  authOverlay.classList.add("auth-overlay--hidden");
-  appLayout.style.filter = "none";
+  items.forEach((msg) => {
+    const card = document.createElement("article");
+    card.className = "message-card";
+    card.innerHTML = `
+      <div class="message-meta">${msg.account} • ${msg.time}</div>
+      <strong>${msg.from}</strong>
+      <p>${msg.text}</p>
+    `;
+    messagesList.append(card);
+  });
+}
 
-  const firstLetter = login[0]?.toUpperCase() || "A";
-  userName.textContent = login;
-  accountLogin.value = login;
-
-  if (accounts[login].avatar) {
-    userAvatar.style.backgroundImage = `url(${accounts[login].avatar})`;
-    userAvatar.style.backgroundSize = "cover";
-    userAvatar.textContent = "";
-    avatarPreview.style.backgroundImage = `url(${accounts[login].avatar})`;
-    avatarPreview.style.backgroundSize = "cover";
-    avatarPreview.textContent = "";
-  } else {
-    userAvatar.style.backgroundImage = "none";
-    avatarPreview.style.backgroundImage = "none";
-    userAvatar.textContent = firstLetter;
-    avatarPreview.textContent = firstLetter;
+function renderList(listRoot, items, emptyText, formatter) {
+  listRoot.innerHTML = "";
+  if (!items.length) {
+    listRoot.innerHTML = `<div class="panel">${emptyText}</div>`;
+    return;
   }
 
-  document.getElementById("profileDescription").value = accounts[login].description || "";
-  twoFactorToggle.checked = Boolean(accounts[login].twoFactor);
+  items.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "list-item";
+    row.innerHTML = `
+      <div>${formatter(item)}</div>
+      <button class="btn btn--ghost" data-index="${index}">Удалить</button>
+    `;
+    listRoot.append(row);
+  });
 }
 
-function toggleSettings() {
-  settingsPanel.classList.toggle("settings-panel--open");
+function render() {
+  const login = currentUserLogin();
+  const users = getUsers();
+
+  if (!login || !users[login]) {
+    closeApp();
+    return;
+  }
+
+  const user = users[login];
+  sidebarName.textContent = user.displayName || login;
+  sidebarAvatar.textContent = (user.displayName || login)[0].toUpperCase();
+
+  document.getElementById("displayName").value = user.displayName || "";
+  document.getElementById("about").value = user.about || "";
+  document.getElementById("twoFactor").checked = Boolean(user.twoFactor);
+
+  renderMessages(user.messages || []);
+  renderList(groupList, user.groups || [], "Групп пока нет.", (g) => `<strong>${g.name}</strong><div>${g.description || "Без описания"}</div>`);
+  renderList(vkList, user.vkAccounts || [], "VK аккаунты пока не подключены.", (a) => `<strong>${a.name}</strong><div>Токен: ${a.token.slice(0, 3)}***</div>`);
 }
 
-settingsBtn.addEventListener("click", toggleSettings);
-profileBtn.addEventListener("click", toggleSettings);
+function saveCurrent(mutator) {
+  const login = currentUserLogin();
+  const users = getUsers();
+  if (!login || !users[login]) return;
+
+  mutator(users[login]);
+  saveUsers(users);
+  render();
+}
 
 authTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
-    authTabs.forEach((button) => button.classList.remove("auth-tab--active"));
+    authTabs.forEach((btn) => btn.classList.remove("auth-tab--active"));
     tab.classList.add("auth-tab--active");
 
-    const isLogin = tab.dataset.tab === "login";
+    const isLogin = tab.dataset.authTab === "login";
     loginForm.classList.toggle("auth-form--active", isLogin);
     registerForm.classList.toggle("auth-form--active", !isLogin);
   });
 });
 
-loginForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const login = document.getElementById("loginUsername").value.trim();
-  const password = document.getElementById("loginPassword").value;
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const login = document.getElementById("login").value.trim();
+  const password = document.getElementById("password").value;
+  const users = getUsers();
 
-  const accounts = getAccounts();
-  if (!accounts[login] || accounts[login].password !== password) {
-    showToast("Неверный логин или пароль");
+  if (!users[login] || users[login].password !== password) {
+    notify("Неверный логин или пароль");
     return;
   }
 
-  setCurrentUser(login);
-  showToast("Вы успешно вошли");
+  openApp(login);
   loginForm.reset();
+  notify("Вход выполнен");
 });
 
-registerForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const login = document.getElementById("registerUsername").value.trim();
-  const password = document.getElementById("registerPassword").value;
+registerForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const login = document.getElementById("newLogin").value.trim();
+  const password = document.getElementById("newPassword").value;
+  const users = getUsers();
 
   if (!login || password.length < 6) {
-    showToast("Пароль должен быть не короче 6 символов");
+    notify("Введите логин и пароль от 6 символов");
     return;
   }
 
-  const accounts = getAccounts();
-  if (accounts[login]) {
-    showToast("Такой логин уже существует");
+  if (users[login]) {
+    notify("Пользователь уже существует");
     return;
   }
 
-  accounts[login] = {
+  users[login] = {
     password,
-    description: "",
-    avatar: "",
+    displayName: login,
+    about: "",
     twoFactor: false,
+    groups: [],
+    vkAccounts: [],
+    messages: [],
   };
-  saveAccounts(accounts);
-  setCurrentUser(login);
-  showToast("Аккаунт создан");
+
+  saveUsers(users);
+  openApp(login);
   registerForm.reset();
+  notify("Аккаунт создан");
 });
 
-passwordForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const login = getCurrentUser();
-  const accounts = getAccounts();
-  const newPassword = document.getElementById("newPassword").value;
+menuItems.forEach((item) => {
+  item.addEventListener("click", () => {
+    menuItems.forEach((btn) => btn.classList.remove("menu-item--active"));
+    item.classList.add("menu-item--active");
 
-  if (!login || !accounts[login]) return;
-
-  accounts[login].password = newPassword;
-  saveAccounts(accounts);
-  showToast("Пароль обновлен");
-  passwordForm.reset();
+    const target = item.dataset.view;
+    document.querySelectorAll(".view").forEach((view) => view.classList.remove("view--active"));
+    document.getElementById(`view-${target}`).classList.add("view--active");
+  });
 });
 
-descriptionForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const login = getCurrentUser();
-  const accounts = getAccounts();
-  const description = document.getElementById("profileDescription").value.trim();
+groupForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("groupName").value.trim();
+  const description = document.getElementById("groupDescription").value.trim();
 
-  if (!login || !accounts[login]) return;
+  if (!name) return;
 
-  accounts[login].description = description;
-  saveAccounts(accounts);
-  showToast("Описание профиля сохранено");
+  saveCurrent((user) => {
+    user.groups.push({ name, description });
+  });
+  groupForm.reset();
+  notify("Группа добавлена");
 });
 
-avatarInput.addEventListener("change", (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
+vkForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("vkName").value.trim();
+  const token = document.getElementById("vkToken").value.trim();
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    const login = getCurrentUser();
-    const accounts = getAccounts();
-    if (!login || !accounts[login]) return;
+  if (!name || !token) return;
 
-    accounts[login].avatar = String(reader.result);
-    saveAccounts(accounts);
-    renderUser();
-    showToast("Аватар обновлен");
-  };
-  reader.readAsDataURL(file);
+  saveCurrent((user) => {
+    user.vkAccounts.push({ name, token });
+  });
+  vkForm.reset();
+  notify("VK аккаунт подключен");
 });
 
-twoFactorForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const login = getCurrentUser();
-  const accounts = getAccounts();
-  if (!login || !accounts[login]) return;
+groupList.addEventListener("click", (e) => {
+  const button = e.target.closest("button[data-index]");
+  if (!button) return;
+  const index = Number(button.dataset.index);
 
-  accounts[login].twoFactor = twoFactorToggle.checked;
-  saveAccounts(accounts);
-  showToast(twoFactorToggle.checked ? "2FA включена" : "2FA выключена");
+  saveCurrent((user) => {
+    user.groups.splice(index, 1);
+  });
+  notify("Группа удалена");
 });
 
-ensureDefaultUser();
-renderUser();
+vkList.addEventListener("click", (e) => {
+  const button = e.target.closest("button[data-index]");
+  if (!button) return;
+  const index = Number(button.dataset.index);
+
+  saveCurrent((user) => {
+    user.vkAccounts.splice(index, 1);
+  });
+  notify("VK аккаунт удален");
+});
+
+profileForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const displayName = document.getElementById("displayName").value.trim();
+  const about = document.getElementById("about").value.trim();
+
+  saveCurrent((user) => {
+    user.displayName = displayName || "Оператор";
+    user.about = about;
+  });
+  notify("Профиль обновлен");
+});
+
+securityForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const newPass = document.getElementById("newPass").value;
+  const twoFactor = document.getElementById("twoFactor").checked;
+
+  saveCurrent((user) => {
+    user.password = newPass;
+    user.twoFactor = twoFactor;
+  });
+
+  securityForm.reset();
+  document.getElementById("twoFactor").checked = twoFactor;
+  notify("Настройки безопасности сохранены");
+});
+
+logoutBtn.addEventListener("click", () => {
+  closeApp();
+  notify("Вы вышли из аккаунта");
+});
+
+messageSearch.addEventListener("input", () => {
+  const query = messageSearch.value.trim().toLowerCase();
+  const login = currentUserLogin();
+  const users = getUsers();
+  if (!login || !users[login]) return;
+
+  const allMessages = users[login].messages || [];
+  const filtered = !query
+    ? allMessages
+    : allMessages.filter((msg) =>
+      `${msg.account} ${msg.from} ${msg.text}`.toLowerCase().includes(query));
+
+  renderMessages(filtered);
+});
+
+ensureDefaults();
+if (currentUserLogin()) {
+  authOverlay.classList.add("auth-overlay--hidden");
+} else {
+  layout.style.filter = "blur(5px)";
+}
+render();
