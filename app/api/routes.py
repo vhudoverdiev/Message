@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.schemas.flow import FlowData
-from app.services.flow_service import flow_service
+from schemas.flow import FlowData
+from services.flow_service import flow_service
 
 router = APIRouter()
 
