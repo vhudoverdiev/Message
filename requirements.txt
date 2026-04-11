@@ -1,7 +1,9 @@
-fastapi
-uvicorn
-jinja2
-sqlalchemy
-python-multipart
-passlib[bcrypt]
-python-dotenv
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+jinja2==3.1.6
+sqlalchemy==2.0.43
+python-multipart==0.0.20
+passlib[bcrypt]==1.7.4
+python-dotenv==1.1.1
+pydantic-settings==2.10.1
+itsdangerous==2.2.0

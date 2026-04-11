@@ -1,3 +1,41 @@
-{% extends 'base.html' %}{% block content %}
-<h1>Сообщения</h1>{% for i in items %}<div class='card'>{{i}}</div>{% endfor %}
+{% extends 'base.html' %}
+{% block content %}
+<h1>Сообщения</h1>
+<div class="card">
+    <form method="get" action="/messages" class="form-grid">
+        <label>Фильтр по аккаунту
+            <select name="account_id">
+                <option value="">Все</option>
+                {% for a in accounts %}
+                <option value="{{a.id}}" {% if account_id == a.id %}selected{% endif %}>{{a.name}}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Поиск<input name="q" value="{{ q }}" placeholder="Текст сообщения"></label>
+        <button class="btn full">Применить</button>
+    </form>
+</div>
+<div class="card table-wrap">
+    <table>
+        <thead><tr><th>Время</th><th>Аккаунт</th><th>Диалог</th><th>Клиент</th><th>Текст</th><th>Статус</th></tr></thead>
+        <tbody>
+        {% for m in messages %}
+        <tr>
+            <td>{{ m.sent_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ m.vk_account.name if m.vk_account else '-' }}</td>
+            <td>{{ m.dialog_id }}</td>
+            <td>{{ m.client.full_name if m.client else '-' }}</td>
+            <td>{{ m.text }}</td>
+            <td>
+                <form method="post" action="/messages/{{m.id}}/toggle-read" class="inline-form">
+                    <button class="btn secondary">{{ 'Прочитано' if m.is_read else 'Непрочитано' }}</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">Сообщений пока нет.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
