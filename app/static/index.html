@@ -3,125 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flow Builder 2.0</title>
+  <title>Месседж</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-  <div class="app-layout">
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-card">
+      <h1>Месседж</h1>
+      <p>Все сообщения в одном месте</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab auth-tab--active" data-tab="login">Вход</button>
+        <button class="auth-tab" data-tab="register">Регистрация</button>
+      </div>
+
+      <form id="loginForm" class="auth-form auth-form--active">
+        <label>Логин</label>
+        <input id="loginUsername" type="text" placeholder="Введите логин" required>
+        <label>Пароль</label>
+        <input id="loginPassword" type="password" placeholder="Введите пароль" required>
+        <button type="submit" class="btn btn--primary">Войти</button>
+      </form>
+
+      <form id="registerForm" class="auth-form">
+        <label>Логин</label>
+        <input id="registerUsername" type="text" placeholder="Новый логин" required>
+        <label>Пароль</label>
+        <input id="registerPassword" type="password" placeholder="Новый пароль" required>
+        <button type="submit" class="btn btn--secondary">Зарегистрироваться</button>
+      </form>
+
+      <small>Тестовый вход: <b>vhudoverdiev</b> / <b>123456</b></small>
+    </div>
+  </div>
+
+  <div class="app-layout" id="appLayout">
     <aside class="sidebar">
+      <div>
+        <div class="project-logo" aria-hidden="true">
+          <span class="project-logo__bubble"></span>
+          <span class="project-logo__bubble project-logo__bubble--small"></span>
+        </div>
+        <div class="project-name">Месседж</div>
+        <div class="project-tagline">все сообщения в одном месте</div>
+      </div>
+
       <div class="brand">
-        <div class="brand__logo">F</div>
+        <div class="brand__logo">M</div>
         <div class="brand__text">
           <div class="brand__title">Flow Desk</div>
-          <div class="brand__subtitle">Builder 2.0</div>
+          <div class="brand__subtitle">Месседж</div>
         </div>
       </div>
 
-      <nav class="main-nav">
-        <a class="nav-item" href="#"><span class="nav-icon">⌂</span><span>Dashboard</span></a>
-        <a class="nav-item" href="#"><span class="nav-icon">👤</span><span>Контакты</span></a>
-        <a class="nav-item" href="#"><span class="nav-icon">📈</span><span>Статистика</span></a>
-        <a class="nav-item" href="#"><span class="nav-icon">☎</span><span>Numbers</span></a>
-        <a class="nav-item nav-item--active" href="#"><span class="nav-icon">🧩</span><span>Flow Builder</span></a>
-        <a class="nav-item" href="#"><span class="nav-icon">✉</span><span>SMS</span></a>
-        <a class="nav-item" href="#"><span class="nav-icon">🎧</span><span>Voice</span></a>
-        <a class="nav-item" href="#"><span class="nav-icon">💬</span><span>Chat</span></a>
-      </nav>
-
       <div class="sidebar-footer">
-        <a class="nav-item" href="#"><span class="nav-icon">⚙</span><span>Настройки</span></a>
-        <div class="user-card">
-          <div class="user-avatar">S</div>
+        <button class="nav-item" id="settingsBtn"><span class="nav-icon">⚙</span><span>Настройки</span></button>
+        <button class="user-card" id="profileBtn">
+          <div class="user-avatar" id="userAvatar">S</div>
           <div>
-            <div class="user-name">Sander</div>
+            <div class="user-name" id="userName">Администратор</div>
             <div class="user-role">Администратор</div>
           </div>
-        </div>
+        </button>
       </div>
     </aside>
 
     <main class="main-content">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Панель управления сценариями</p>
-          <h1>Flow Builder</h1>
-        </div>
+      <h2>Добро пожаловать в Месседж</h2>
+      <p>Управляйте аккаунтом через настройки.</p>
 
-        <div class="topbar-actions">
-          <div class="balance-card">
-            <span class="balance-card__label">BALANCE</span>
-            <strong>€25.00</strong>
+      <section class="settings-panel" id="settingsPanel">
+        <h3>Настройки аккаунта</h3>
+
+        <div class="settings-grid">
+          <div class="settings-block">
+            <h4>Аккаунт</h4>
+            <label>Логин</label>
+            <input id="accountLogin" type="text" readonly>
           </div>
 
-          <button class="btn btn--secondary" id="resetBtn">Reset</button>
-          <button class="btn btn--secondary" id="saveBtn">Save</button>
-          <button class="btn btn--primary" id="publishBtn">Publish</button>
-        </div>
-      </header>
+          <form class="settings-block" id="passwordForm">
+            <h4>Изменение пароля</h4>
+            <label>Новый пароль</label>
+            <input id="newPassword" type="password" minlength="6" required>
+            <button type="submit" class="btn btn--secondary">Сменить пароль</button>
+          </form>
 
-      <section class="workspace-header">
-        <button class="back-button">← Back to flows overview</button>
+          <form class="settings-block" id="descriptionForm">
+            <h4>Описание профиля</h4>
+            <textarea id="profileDescription" rows="4" placeholder="Расскажите о себе"></textarea>
+            <button type="submit" class="btn btn--secondary">Сохранить описание</button>
+          </form>
 
-        <div class="flow-title-block">
-          <h2 id="flowName">Call Center</h2>
-          <p>Полноценная версия 2.0 с backend, API и сохранением сценария.</p>
-        </div>
+          <form class="settings-block" id="avatarForm">
+            <h4>Сменить аватар</h4>
+            <input id="avatarInput" type="file" accept="image/*">
+            <div class="avatar-preview" id="avatarPreview">A</div>
+          </form>
 
-        <div class="status-pill" id="publishStatus">Draft</div>
-      </section>
-
-      <section class="workspace">
-        <div class="steps-panel">
-          <div class="panel-card">
-            <div class="panel-card__header">
-              <div>
-                <h3>Steps</h3>
-                <p>Нажми на шаг, чтобы добавить его в сценарий</p>
-              </div>
-            </div>
-
-            <div class="step-list" id="stepPalette">
-              <button class="step-item" data-type="incoming">Incoming call <span>+</span></button>
-              <button class="step-item" data-type="tts">Text-to-speech <span>+</span></button>
-              <button class="step-item" data-type="sound">Play Sound File <span>+</span></button>
-              <button class="step-item" data-type="if">If ... Then ... <span>+</span></button>
-              <button class="step-item" data-type="forward">Forward Call <span>+</span></button>
-              <button class="step-item" data-type="record">Record Call Audio <span>+</span></button>
-              <button class="step-item" data-type="url">Fetch call flow from URL <span>+</span></button>
-              <button class="step-item" data-type="pause">Pause <span>+</span></button>
-              <button class="step-item" data-type="end">End Call <span>+</span></button>
-            </div>
-          </div>
-        </div>
-
-        <div class="canvas-area">
-          <div class="canvas-grid"></div>
-
-          <div class="flow-column">
-            <div class="board-toolbar">
-              <div class="board-toolbar__left">
-                <span class="mini-badge">Live editor</span>
-                <span class="mini-badge mini-badge--muted">Saved to JSON</span>
-              </div>
-              <div class="board-toolbar__right">
-                <button class="toolbar-btn" id="renameBtn">Rename flow</button>
-              </div>
-            </div>
-
-            <div class="dynamic-list" id="dynamicList"></div>
-
-            <div class="drop-zone" id="dropZone">+ Add step to the end of the flow</div>
-          </div>
+          <form class="settings-block" id="twoFactorForm">
+            <h4>Двухэтапная аутентификация</h4>
+            <label class="switch">
+              <input id="twoFactorToggle" type="checkbox">
+              <span>Включить 2FA</span>
+            </label>
+            <button type="submit" class="btn btn--secondary">Сохранить 2FA</button>
+          </form>
         </div>
       </section>
     </main>
   </div>
 
   <div class="toast" id="toast"></div>
-
   <script src="/static/script.js"></script>
 </body>
 </html>

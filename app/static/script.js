@@ -1,287 +1,221 @@
-const stepLibrary = {
-  incoming: {
-    title: "Incoming call",
-    description: "+31 6 12312345",
-    className: "flow-node--incoming",
-    icon: "📞",
-  },
-  tts: {
-    title: "Text-to-speech",
-    description: "Generated voice message for caller",
-    className: "flow-node--tts",
-    icon: "🔊",
-  },
-  sound: {
-    title: "Play Sound File",
-    description: "Custom audio file playback",
-    className: "flow-node--sound",
-    icon: "🎵",
-  },
-  if: {
-    title: "If",
-    description: "If the caller presses a button → Then ...",
-    className: "flow-node--if",
-    icon: "↳",
-  },
-  forward: {
-    title: "Forward Call",
-    description: "Route the call to another number",
-    className: "flow-node--forward",
-    icon: "📲",
-  },
-  record: {
-    title: "Record Call Audio",
-    description: "Save voice message from caller",
-    className: "flow-node--record",
-    icon: "⏺",
-  },
-  url: {
-    title: "Fetch call flow from URL",
-    description: "Load external flow by URL",
-    className: "flow-node--url",
-    icon: "🔗",
-  },
-  pause: {
-    title: "Pause",
-    description: "Wait 10 seconds before next step",
-    className: "flow-node--pause",
-    icon: "⏸",
-  },
-  end: {
-    title: "End Call",
-    description: "Finish call scenario",
-    className: "flow-node--end",
-    icon: "☎",
-  },
-};
+const DEFAULT_LOGIN = "vhudoverdiev";
+const DEFAULT_PASSWORD = "123456";
 
-const state = {
-  flow_name: "Call Center",
-  is_published: false,
-  steps: [],
-};
-
-const dynamicList = document.getElementById("dynamicList");
-const stepPalette = document.getElementById("stepPalette");
-const saveBtn = document.getElementById("saveBtn");
-const resetBtn = document.getElementById("resetBtn");
-const publishBtn = document.getElementById("publishBtn");
-const renameBtn = document.getElementById("renameBtn");
-const dropZone = document.getElementById("dropZone");
+const authOverlay = document.getElementById("authOverlay");
+const appLayout = document.getElementById("appLayout");
 const toast = document.getElementById("toast");
-const flowNameElement = document.getElementById("flowName");
-const publishStatusElement = document.getElementById("publishStatus");
 
-function generateId(prefix = "step") {
-  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-}
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const authTabs = document.querySelectorAll(".auth-tab");
+
+const settingsPanel = document.getElementById("settingsPanel");
+const settingsBtn = document.getElementById("settingsBtn");
+const profileBtn = document.getElementById("profileBtn");
+
+const userName = document.getElementById("userName");
+const userAvatar = document.getElementById("userAvatar");
+const accountLogin = document.getElementById("accountLogin");
+
+const passwordForm = document.getElementById("passwordForm");
+const descriptionForm = document.getElementById("descriptionForm");
+const avatarInput = document.getElementById("avatarInput");
+const avatarPreview = document.getElementById("avatarPreview");
+const twoFactorForm = document.getElementById("twoFactorForm");
+const twoFactorToggle = document.getElementById("twoFactorToggle");
+
+const STORE_KEY = "message_accounts";
+const USER_KEY = "message_current_user";
 
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add("toast--visible");
-
   clearTimeout(window.toastTimer);
-  window.toastTimer = setTimeout(() => {
-    toast.classList.remove("toast--visible");
-  }, 2200);
+  window.toastTimer = setTimeout(() => toast.classList.remove("toast--visible"), 2200);
 }
 
-function getStepView(step) {
-  const fallback = {
-    className: "flow-node--tts",
-    icon: "•",
+function getAccounts() {
+  const raw = localStorage.getItem(STORE_KEY);
+  return raw ? JSON.parse(raw) : {};
+}
+
+function saveAccounts(accounts) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(accounts));
+}
+
+function ensureDefaultUser() {
+  const accounts = getAccounts();
+  if (!accounts[DEFAULT_LOGIN]) {
+    accounts[DEFAULT_LOGIN] = {
+      password: DEFAULT_PASSWORD,
+      description: "",
+      avatar: "",
+      twoFactor: false,
+    };
+    saveAccounts(accounts);
+  }
+}
+
+function setCurrentUser(login) {
+  localStorage.setItem(USER_KEY, login);
+  renderUser();
+}
+
+function getCurrentUser() {
+  return localStorage.getItem(USER_KEY);
+}
+
+function renderUser() {
+  const login = getCurrentUser();
+  const accounts = getAccounts();
+  if (!login || !accounts[login]) {
+    authOverlay.classList.remove("auth-overlay--hidden");
+    appLayout.style.filter = "blur(4px)";
+    return;
+  }
+
+  authOverlay.classList.add("auth-overlay--hidden");
+  appLayout.style.filter = "none";
+
+  const firstLetter = login[0]?.toUpperCase() || "A";
+  userName.textContent = login;
+  accountLogin.value = login;
+
+  if (accounts[login].avatar) {
+    userAvatar.style.backgroundImage = `url(${accounts[login].avatar})`;
+    userAvatar.style.backgroundSize = "cover";
+    userAvatar.textContent = "";
+    avatarPreview.style.backgroundImage = `url(${accounts[login].avatar})`;
+    avatarPreview.style.backgroundSize = "cover";
+    avatarPreview.textContent = "";
+  } else {
+    userAvatar.style.backgroundImage = "none";
+    avatarPreview.style.backgroundImage = "none";
+    userAvatar.textContent = firstLetter;
+    avatarPreview.textContent = firstLetter;
+  }
+
+  document.getElementById("profileDescription").value = accounts[login].description || "";
+  twoFactorToggle.checked = Boolean(accounts[login].twoFactor);
+}
+
+function toggleSettings() {
+  settingsPanel.classList.toggle("settings-panel--open");
+}
+
+settingsBtn.addEventListener("click", toggleSettings);
+profileBtn.addEventListener("click", toggleSettings);
+
+authTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    authTabs.forEach((button) => button.classList.remove("auth-tab--active"));
+    tab.classList.add("auth-tab--active");
+
+    const isLogin = tab.dataset.tab === "login";
+    loginForm.classList.toggle("auth-form--active", isLogin);
+    registerForm.classList.toggle("auth-form--active", !isLogin);
+  });
+});
+
+loginForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const login = document.getElementById("loginUsername").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  const accounts = getAccounts();
+  if (!accounts[login] || accounts[login].password !== password) {
+    showToast("Неверный логин или пароль");
+    return;
+  }
+
+  setCurrentUser(login);
+  showToast("Вы успешно вошли");
+  loginForm.reset();
+});
+
+registerForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const login = document.getElementById("registerUsername").value.trim();
+  const password = document.getElementById("registerPassword").value;
+
+  if (!login || password.length < 6) {
+    showToast("Пароль должен быть не короче 6 символов");
+    return;
+  }
+
+  const accounts = getAccounts();
+  if (accounts[login]) {
+    showToast("Такой логин уже существует");
+    return;
+  }
+
+  accounts[login] = {
+    password,
+    description: "",
+    avatar: "",
+    twoFactor: false,
   };
+  saveAccounts(accounts);
+  setCurrentUser(login);
+  showToast("Аккаунт создан");
+  registerForm.reset();
+});
 
-  return stepLibrary[step.type] || fallback;
-}
+passwordForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const login = getCurrentUser();
+  const accounts = getAccounts();
+  const newPassword = document.getElementById("newPassword").value;
 
-function updateHeader() {
-  flowNameElement.textContent = state.flow_name;
-  publishStatusElement.textContent = state.is_published ? "Published" : "Draft";
-  publishStatusElement.classList.toggle("status-pill--published", state.is_published);
-}
+  if (!login || !accounts[login]) return;
 
-function renderFlow() {
-  dynamicList.innerHTML = "";
+  accounts[login].password = newPassword;
+  saveAccounts(accounts);
+  showToast("Пароль обновлен");
+  passwordForm.reset();
+});
 
-  state.steps.forEach((step, index) => {
-    const view = getStepView(step);
-    const segment = document.createElement("div");
-    segment.className = "flow-segment";
+descriptionForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const login = getCurrentUser();
+  const accounts = getAccounts();
+  const description = document.getElementById("profileDescription").value.trim();
 
-    const connectorTop = index === 0 ? "" : '<div class="connector"></div>';
+  if (!login || !accounts[login]) return;
 
-    segment.innerHTML = `
-      ${connectorTop}
-      <div class="flow-node ${view.className}">
-        <div class="flow-node__icon">${view.icon}</div>
-        <div class="flow-node__content">
-          <strong>${step.title}</strong>
-          <span>${step.description}</span>
-        </div>
-        <div class="node-actions">
-          <button class="icon-btn move-up-btn" title="Поднять выше">↑</button>
-          <button class="icon-btn remove-btn" title="Удалить">×</button>
-        </div>
-      </div>
-    `;
+  accounts[login].description = description;
+  saveAccounts(accounts);
+  showToast("Описание профиля сохранено");
+});
 
-    const removeBtn = segment.querySelector(".remove-btn");
-    const moveUpBtn = segment.querySelector(".move-up-btn");
+avatarInput.addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-    removeBtn.addEventListener("click", () => {
-      state.steps = state.steps.filter((item) => item.id !== step.id);
-      state.is_published = false;
-      renderFlow();
-      updateHeader();
-    });
+  const reader = new FileReader();
+  reader.onload = () => {
+    const login = getCurrentUser();
+    const accounts = getAccounts();
+    if (!login || !accounts[login]) return;
 
-    moveUpBtn.addEventListener("click", () => {
-      const currentIndex = state.steps.findIndex((item) => item.id === step.id);
-      if (currentIndex > 0) {
-        [state.steps[currentIndex - 1], state.steps[currentIndex]] = [state.steps[currentIndex], state.steps[currentIndex - 1]];
-        state.is_published = false;
-        renderFlow();
-        updateHeader();
-      }
-    });
-
-    dynamicList.appendChild(segment);
-  });
-}
-
-async function loadFlow() {
-  const response = await fetch("/api/flow");
-  const data = await response.json();
-
-  state.flow_name = data.flow_name;
-  state.is_published = data.is_published;
-  state.steps = data.steps;
-
-  updateHeader();
-  renderFlow();
-}
-
-function createStepByType(type) {
-  const config = stepLibrary[type];
-  if (!config) return null;
-
-  return {
-    id: generateId(type),
-    type,
-    title: config.title,
-    description: config.description,
+    accounts[login].avatar = String(reader.result);
+    saveAccounts(accounts);
+    renderUser();
+    showToast("Аватар обновлен");
   };
-}
-
-stepPalette.addEventListener("click", (event) => {
-  const button = event.target.closest(".step-item");
-  if (!button) return;
-
-  const newStep = createStepByType(button.dataset.type);
-  if (!newStep) return;
-
-  state.steps.push(newStep);
-  state.is_published = false;
-  renderFlow();
-  updateHeader();
+  reader.readAsDataURL(file);
 });
 
-dropZone.addEventListener("click", () => {
-  const newStep = createStepByType("tts");
-  state.steps.push(newStep);
-  state.is_published = false;
-  renderFlow();
-  updateHeader();
+twoFactorForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const login = getCurrentUser();
+  const accounts = getAccounts();
+  if (!login || !accounts[login]) return;
+
+  accounts[login].twoFactor = twoFactorToggle.checked;
+  saveAccounts(accounts);
+  showToast(twoFactorToggle.checked ? "2FA включена" : "2FA выключена");
 });
 
-saveBtn.addEventListener("click", async () => {
-  const response = await fetch("/api/flow", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(state),
-  });
-
-  if (!response.ok) {
-    showToast("Ошибка при сохранении");
-    return;
-  }
-
-  const data = await response.json();
-  state.flow_name = data.flow_name;
-  state.is_published = data.is_published;
-  state.steps = data.steps;
-
-  updateHeader();
-  renderFlow();
-  showToast("Сценарий сохранен");
-});
-
-resetBtn.addEventListener("click", async () => {
-  const response = await fetch("/api/flow/reset", {
-    method: "POST",
-  });
-
-  if (!response.ok) {
-    showToast("Ошибка при сбросе");
-    return;
-  }
-
-  const data = await response.json();
-  state.flow_name = data.flow_name;
-  state.is_published = data.is_published;
-  state.steps = data.steps;
-
-  updateHeader();
-  renderFlow();
-  showToast("Сценарий сброшен");
-});
-
-publishBtn.addEventListener("click", async () => {
-  const saveResponse = await fetch("/api/flow", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(state),
-  });
-
-  if (!saveResponse.ok) {
-    showToast("Ошибка при сохранении перед публикацией");
-    return;
-  }
-
-  const publishResponse = await fetch("/api/flow/publish", {
-    method: "POST",
-  });
-
-  if (!publishResponse.ok) {
-    showToast("Ошибка публикации");
-    return;
-  }
-
-  const data = await publishResponse.json();
-  state.flow_name = data.flow_name;
-  state.is_published = data.is_published;
-  state.steps = data.steps;
-
-  updateHeader();
-  renderFlow();
-  showToast("Сценарий опубликован");
-});
-
-renameBtn.addEventListener("click", () => {
-  const newName = prompt("Введите новое название сценария:", state.flow_name);
-  if (!newName) return;
-
-  state.flow_name = newName.trim() || state.flow_name;
-  state.is_published = false;
-  updateHeader();
-});
-
-loadFlow().catch((error) => {
-  console.error(error);
-  showToast("Не удалось загрузить сценарий");
-});
+ensureDefaultUser();
+renderUser();
