@@ -1,0 +1,60 @@
+{
+  "flow_name": "Call Center",
+  "is_published": false,
+  "steps": [
+    {
+      "id": "step-incoming",
+      "type": "incoming",
+      "title": "Incoming call",
+      "description": "+31 6 12312345"
+    },
+    {
+      "id": "step-tts",
+      "type": "tts",
+      "title": "Text-to-speech",
+      "description": "Welcome to the Flow Builder. To continue, press 6."
+    },
+    {
+      "id": "step-sound",
+      "type": "sound",
+      "title": "Play Sound File",
+      "description": "wait_muzak.wav"
+    },
+    {
+      "id": "step-forward",
+      "type": "forward",
+      "title": "Forward Call",
+      "description": "Forward call to selected number"
+    },
+    {
+      "id": "step-if",
+      "type": "if",
+      "title": "If",
+      "description": "If the caller presses 6 → Then ..."
+    },
+    {
+      "id": "step-record",
+      "type": "record",
+      "title": "Record Call Audio",
+      "description": "Record the user's message"
+    },
+    {
+      "id": "step-url",
+      "type": "url",
+      "title": "Fetch call flow from URL",
+      "description": "https://www.messagebird.com/flow"
+    },
+    {
+      "id": "step-pause",
+      "type": "pause",
+      "title": "Pause",
+      "description": "10 seconds"
+    },
+    {
+      "id": "step-end",
+      "type": "end",
+      "title": "End Call",
+      "description": "Scenario completed"
+    }
+  ]
+}

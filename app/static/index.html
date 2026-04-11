@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flow Builder 2.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand__logo">F</div>
+        <div class="brand__text">
+          <div class="brand__title">Flow Desk</div>
+          <div class="brand__subtitle">Builder 2.0</div>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <a class="nav-item" href="#"><span class="nav-icon">⌂</span><span>Dashboard</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">👤</span><span>Контакты</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">📈</span><span>Статистика</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">☎</span><span>Numbers</span></a>
+        <a class="nav-item nav-item--active" href="#"><span class="nav-icon">🧩</span><span>Flow Builder</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">✉</span><span>SMS</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">🎧</span><span>Voice</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">💬</span><span>Chat</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a class="nav-item" href="#"><span class="nav-icon">⚙</span><span>Настройки</span></a>
+        <div class="user-card">
+          <div class="user-avatar">S</div>
+          <div>
+            <div class="user-name">Sander</div>
+            <div class="user-role">Администратор</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Панель управления сценариями</p>
+          <h1>Flow Builder</h1>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="balance-card">
+            <span class="balance-card__label">BALANCE</span>
+            <strong>€25.00</strong>
+          </div>
+
+          <button class="btn btn--secondary" id="resetBtn">Reset</button>
+          <button class="btn btn--secondary" id="saveBtn">Save</button>
+          <button class="btn btn--primary" id="publishBtn">Publish</button>
+        </div>
+      </header>
+
+      <section class="workspace-header">
+        <button class="back-button">← Back to flows overview</button>
+
+        <div class="flow-title-block">
+          <h2 id="flowName">Call Center</h2>
+          <p>Полноценная версия 2.0 с backend, API и сохранением сценария.</p>
+        </div>
+
+        <div class="status-pill" id="publishStatus">Draft</div>
+      </section>
+
+      <section class="workspace">
+        <div class="steps-panel">
+          <div class="panel-card">
+            <div class="panel-card__header">
+              <div>
+                <h3>Steps</h3>
+                <p>Нажми на шаг, чтобы добавить его в сценарий</p>
+              </div>
+            </div>
+
+            <div class="step-list" id="stepPalette">
+              <button class="step-item" data-type="incoming">Incoming call <span>+</span></button>
+              <button class="step-item" data-type="tts">Text-to-speech <span>+</span></button>
+              <button class="step-item" data-type="sound">Play Sound File <span>+</span></button>
+              <button class="step-item" data-type="if">If ... Then ... <span>+</span></button>
+              <button class="step-item" data-type="forward">Forward Call <span>+</span></button>
+              <button class="step-item" data-type="record">Record Call Audio <span>+</span></button>
+              <button class="step-item" data-type="url">Fetch call flow from URL <span>+</span></button>
+              <button class="step-item" data-type="pause">Pause <span>+</span></button>
+              <button class="step-item" data-type="end">End Call <span>+</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-area">
+          <div class="canvas-grid"></div>
+
+          <div class="flow-column">
+            <div class="board-toolbar">
+              <div class="board-toolbar__left">
+                <span class="mini-badge">Live editor</span>
+                <span class="mini-badge mini-badge--muted">Saved to JSON</span>
+              </div>
+              <div class="board-toolbar__right">
+                <button class="toolbar-btn" id="renameBtn">Rename flow</button>
+              </div>
+            </div>
+
+            <div class="dynamic-list" id="dynamicList"></div>
+
+            <div class="drop-zone" id="dropZone">+ Add step to the end of the flow</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
