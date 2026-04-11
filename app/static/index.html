@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Месседж</title>
+  <title>Message</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,8 +12,19 @@
 <body>
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
-      <h1>Месседж</h1>
-      <p>Все сообщения в одном месте</p>
+      <div class="auth-header">
+        <div class="brand__logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" role="presentation">
+            <rect x="6" y="10" width="52" height="40" rx="13" ry="13"></rect>
+            <path d="M18 26h28M18 34h19"></path>
+            <circle cx="47" cy="45" r="5"></circle>
+          </svg>
+        </div>
+        <div>
+          <h1>Message</h1>
+          <p>Все сообщения в одном месте.</p>
+        </div>
+      </div>
 
       <div class="auth-tabs">
         <button class="auth-tab auth-tab--active" data-tab="login">Вход</button>
@@ -43,25 +54,42 @@
   <div class="app-layout" id="appLayout">
     <aside class="sidebar">
       <div>
-        <div class="project-logo" aria-hidden="true">
-          <span class="project-logo__bubble"></span>
-          <span class="project-logo__bubble project-logo__bubble--small"></span>
+        <div class="brand">
+          <div class="brand__logo" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="presentation">
+              <rect x="6" y="10" width="52" height="40" rx="13" ry="13"></rect>
+              <path d="M18 26h28M18 34h19"></path>
+              <circle cx="47" cy="45" r="5"></circle>
+            </svg>
+          </div>
+          <div class="brand__text">
+            <div class="brand__title">Message</div>
+            <div class="brand__subtitle">Все сообщения в одном месте.</div>
+          </div>
         </div>
-        <div class="project-name">Месседж</div>
-        <div class="project-tagline">все сообщения в одном месте</div>
-      </div>
 
-      <div class="brand">
-        <div class="brand__logo">M</div>
-        <div class="brand__text">
-          <div class="brand__title">Flow Desk</div>
-          <div class="brand__subtitle">Месседж</div>
-        </div>
+        <nav class="sidebar-nav" aria-label="Разделы">
+          <button class="nav-item nav-item--active" type="button">
+            <span class="nav-icon">💬</span>
+            <span>Сообщения</span>
+          </button>
+          <button class="nav-item" type="button">
+            <span class="nav-icon">📥</span>
+            <span>Входящие</span>
+          </button>
+          <button class="nav-item" type="button">
+            <span class="nav-icon">⭐</span>
+            <span>Избранное</span>
+          </button>
+          <button class="nav-item" id="settingsBtn" type="button">
+            <span class="nav-icon">⚙️</span>
+            <span>Настройки</span>
+          </button>
+        </nav>
       </div>
 
       <div class="sidebar-footer">
-        <button class="nav-item" id="settingsBtn"><span class="nav-icon">⚙</span><span>Настройки</span></button>
-        <button class="user-card" id="profileBtn">
+        <button class="user-card" id="profileBtn" type="button">
           <div class="user-avatar" id="userAvatar">S</div>
           <div>
             <div class="user-name" id="userName">Администратор</div>
@@ -72,8 +100,8 @@
     </aside>
 
     <main class="main-content">
-      <h2>Добро пожаловать в Месседж</h2>
-      <p>Управляйте аккаунтом через настройки.</p>
+      <h2>Добро пожаловать в Message</h2>
+      <p>Управляйте аккаунтом и персонализацией через блок настроек.</p>
 
       <section class="settings-panel" id="settingsPanel">
         <h3>Настройки аккаунта</h3>
