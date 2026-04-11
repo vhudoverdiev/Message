@@ -1,3 +1,22 @@
-{% extends 'base.html' %}{% block content %}
-<h1>Логи</h1>{% for i in items %}<div class='card'>{{i}}</div>{% endfor %}
+{% extends 'base.html' %}
+{% block content %}
+<h1>Логи</h1>
+<div class="card table-wrap">
+    <table>
+        <thead><tr><th>Дата</th><th>Уровень</th><th>Действие</th><th>Детали</th><th>Пользователь</th></tr></thead>
+        <tbody>
+        {% for l in logs %}
+        <tr>
+            <td>{{ l.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            <td>{{ l.level }}</td>
+            <td>{{ l.action }}</td>
+            <td>{{ l.details }}</td>
+            <td>{{ l.user.username if l.user else '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">Логи отсутствуют.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

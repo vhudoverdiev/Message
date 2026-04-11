@@ -1,3 +1,69 @@
-{% extends 'base.html' %}{% block content %}
-<h1>VK Аккаунты</h1>{% for i in items %}<div class='card'>{{i}}</div>{% endfor %}
+{% extends 'base.html' %}
+{% block content %}
+<h1>VK аккаунты</h1>
+<div class="card">
+    <h3>Добавить аккаунт</h3>
+    <form method="post" action="/accounts/create" class="form-grid">
+        <label>Название<input name="name" required></label>
+        <label>Group ID<input name="group_id" required></label>
+        <label>Статус
+            <select name="status">
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+                <option value="error">error</option>
+            </select>
+        </label>
+        <label>Access token<input name="access_token"></label>
+        <label>Long Poll Server<input name="long_poll_server"></label>
+        <label>Long Poll Key<input name="long_poll_key"></label>
+        <label>Long Poll TS<input name="long_poll_ts"></label>
+        <label class="full">Описание<textarea name="description"></textarea></label>
+        <button class="btn full" type="submit">Сохранить аккаунт</button>
+    </form>
+</div>
+
+<div class="card table-wrap">
+    <table>
+        <thead><tr><th>ID</th><th>Название</th><th>Group</th><th>Статус</th><th>VK config</th><th>Действия</th></tr></thead>
+        <tbody>
+        {% for a in accounts %}
+        <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.name }}</td>
+            <td>{{ a.group_id }}</td>
+            <td><span class="badge {{ a.status }}">{{ a.status }}</span></td>
+            <td class="small">token={{ 'set' if a.access_token else 'empty' }}<br>server={{ a.long_poll_server or '-' }}</td>
+            <td>
+                <div class="row-actions">
+                    <form method="post" action="/accounts/{{a.id}}/sync" class="inline-form"><button class="btn secondary">Синхро</button></form>
+                    <details>
+                        <summary>Редактировать</summary>
+                        <form method="post" action="/accounts/{{a.id}}/update" class="form-grid">
+                            <input name="name" value="{{a.name}}" required>
+                            <input name="group_id" value="{{a.group_id}}" required>
+                            <select name="status">
+                                <option value="active" {% if a.status=='active' %}selected{% endif %}>active</option>
+                                <option value="inactive" {% if a.status=='inactive' %}selected{% endif %}>inactive</option>
+                                <option value="error" {% if a.status=='error' %}selected{% endif %}>error</option>
+                            </select>
+                            <input name="access_token" value="{{a.access_token}}">
+                            <input name="long_poll_server" value="{{a.long_poll_server}}">
+                            <input name="long_poll_key" value="{{a.long_poll_key}}">
+                            <input name="long_poll_ts" value="{{a.long_poll_ts}}">
+                            <textarea name="description" class="full">{{a.description}}</textarea>
+                            <button class="btn full">Обновить</button>
+                        </form>
+                    </details>
+                    <form method="post" action="/accounts/{{a.id}}/delete" data-confirm="Удалить аккаунт?" class="inline-form">
+                        <button class="btn danger">Удалить</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">Нет подключенных аккаунтов.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

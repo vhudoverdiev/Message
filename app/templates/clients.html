@@ -1,3 +1,51 @@
-{% extends 'base.html' %}{% block content %}
-<h1>Клиенты</h1>{% for i in items %}<div class='card'>{{i}}</div>{% endfor %}
+{% extends 'base.html' %}
+{% block content %}
+<h1>Клиенты</h1>
+<div class="card">
+    <form method="post" action="/clients/create" class="form-grid">
+        <label>Имя<input name="full_name" required></label>
+        <label>VK ссылка<input name="vk_link" required></label>
+        <label>VK ID<input name="vk_user_id"></label>
+        <label>Теги<input name="tags" placeholder="vip,new"></label>
+        <label>Статус
+            <select name="status">
+                <option value="new">new</option>
+                <option value="in_progress">in_progress</option>
+                <option value="done">done</option>
+            </select>
+        </label>
+        <label>Ответственный
+            <select name="manager_id">
+                <option value="">Не назначен</option>
+                {% for m in managers %}<option value="{{m.id}}">{{m.full_name}}</option>{% endfor %}
+            </select>
+        </label>
+        <label class="full">Заметки<textarea name="notes"></textarea></label>
+        <button class="btn full">Добавить клиента</button>
+    </form>
+</div>
+<div class="card table-wrap">
+    <table>
+        <thead><tr><th>Имя</th><th>VK</th><th>Теги</th><th>Статус</th><th>Менеджер</th><th>Заметки</th><th></th></tr></thead>
+        <tbody>
+        {% for c in clients %}
+        <tr>
+            <td>{{c.full_name}}</td>
+            <td><a href="{{c.vk_link}}" target="_blank">{{c.vk_link}}</a><br><span class="small">{{c.vk_user_id}}</span></td>
+            <td>{{c.tags}}</td>
+            <td><span class="badge {% if c.status=='new' %}new{% elif c.status=='done' %}done{% else %}work{% endif %}">{{c.status}}</span></td>
+            <td>{{c.manager.full_name if c.manager else '-'}}</td>
+            <td>{{c.notes}}</td>
+            <td>
+                <form method="post" action="/clients/{{c.id}}/delete" data-confirm="Удалить клиента?" class="inline-form">
+                    <button class="btn danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">Нет клиентов.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

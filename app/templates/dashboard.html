@@ -1,3 +1,24 @@
-{% extends 'base.html' %}{% block content %}
-<h1>Dashboard</h1><div class='cards'><div class='card'>Аккаунты: {{stats.accounts}}</div><div class='card'>Сообщения: {{stats.messages}}</div><div class='card'>Клиенты: {{stats.clients}}</div><div class='card'>Диалоги: {{stats.dialogs}}</div></div>
+{% extends 'base.html' %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="grid-4">
+    <div class="card"><div class="kpi-title">VK аккаунты</div><div class="kpi-value">{{ stats.accounts }}</div></div>
+    <div class="card"><div class="kpi-title">Новые сообщения</div><div class="kpi-value">{{ stats.new_messages }}</div></div>
+    <div class="card"><div class="kpi-title">Клиенты</div><div class="kpi-value">{{ stats.clients }}</div></div>
+    <div class="card"><div class="kpi-title">Активные диалоги</div><div class="kpi-value">{{ stats.dialogs }}</div></div>
+</div>
+<div class="grid-2">
+    <div class="card">
+        <h3>Быстрый старт VK интеграции</h3>
+        <ol>
+            <li>Добавьте VK аккаунт на странице «VK аккаунты».</li>
+            <li>Укажите <b>access_token</b>, <b>group_id</b> и long poll поля.</li>
+            <li>Нажмите «Синхронизировать», чтобы проверить подключение.</li>
+        </ol>
+    </div>
+    <div class="card">
+        <h3>Статус</h3>
+        <p>Проект готов для локального запуска. Для реального VK API замените методы в <code>app/services/vk_service.py</code>.</p>
+    </div>
+</div>
 {% endblock %}

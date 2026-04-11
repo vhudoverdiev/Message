@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Пользователи</h1>
+<div class="card">
+    <form method="post" action="/users/create" class="form-grid">
+        <label>Логин<input name="username" required></label>
+        <label>ФИО<input name="full_name" required></label>
+        <label>Роль
+            <select name="role"><option value="manager">manager</option><option value="admin">admin</option></select>
+        </label>
+        <label>Пароль<input name="password" type="password" required></label>
+        <button class="btn full">Добавить пользователя</button>
+    </form>
+</div>
+<div class="card table-wrap">
+    <table>
+        <thead><tr><th>ID</th><th>Логин</th><th>ФИО</th><th>Роль</th><th>Активен</th></tr></thead>
+        <tbody>
+        {% for u in users %}
+        <tr><td>{{u.id}}</td><td>{{u.username}}</td><td>{{u.full_name}}</td><td>{{u.role}}</td><td>{{u.is_active}}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
