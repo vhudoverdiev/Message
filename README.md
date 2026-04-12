@@ -15,6 +15,7 @@
 - Единая таблица сообщений по всем аккаунтам + фильтрация/поиск
 - Логи действий пользователей
 - Сервисный слой для интеграции с VK API (`app/services/vk_service.py`)
+- Этап 15: ручное подключение **1 личного VK аккаунта** через user token
 
 ## Запуск
 ```bash
@@ -37,10 +38,19 @@ uvicorn app.main:app --reload
 DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/vk_crm
 ```
 
+## Этап 15: как подключить личный аккаунт (manual user token)
+1. Войдите в CRM под `admin`.
+2. Откройте страницу **VK аккаунты**.
+3. Добавьте один аккаунт и вставьте `user token` вручную.
+4. Нажмите **Проверить токен** (вызов `users.get`).
+5. Нажмите **Синхро диалогов** (вызов `messages.getConversations`).
+
+> В этой схеме VK ID OAuth не используется.
+
 ## Где расширять VK интеграцию
 - `app/services/vk_service.py`
-  - `validate_connection` — проверка токена и long poll
-  - `sync_messages_stub` — заменяется на реальный fetch из VK API
+  - `validate_connection` — проверка user token через VK API
+  - `sync_dialogs` — синхронизация диалогов личного аккаунта
   - `long_poll_config_map` — маппинг параметров группы
 
 ## Архитектура
