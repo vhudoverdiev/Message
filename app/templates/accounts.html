@@ -2,10 +2,20 @@
 {% block content %}
 <h1>VK аккаунты</h1>
 <div class="card">
-    <h3>Добавить аккаунт</h3>
+    <h3>Этап 15: личный аккаунт через user token (без VK ID OAuth)</h3>
+    <ol>
+        <li>Получите <b>user token</b> личного VK аккаунта с правами <code>messages</code> и <code>offline</code>.</li>
+        <li>На этой странице создайте <b>один</b> аккаунт и вставьте токен вручную.</li>
+        <li>Нажмите <b>Проверить токен</b> — система выполнит <code>users.get</code>.</li>
+        <li>Нажмите <b>Синхро диалогов</b> — система загрузит диалоги через <code>messages.getConversations</code>.</li>
+    </ol>
+    <p class="small">Схема подключения: <b>вставил токен → проверил токен → синхронизировал диалоги</b>.</p>
+</div>
+<div class="card">
+    <h3>Добавить 1 личный аккаунт</h3>
     <form method="post" action="/accounts/create" class="form-grid">
         <label>Название<input name="name" required></label>
-        <label>Group ID<input name="group_id" required></label>
+        <label>VK User ID / alias<input name="group_id" required placeholder="например: id123456 или username"></label>
         <label>Статус
             <select name="status">
                 <option value="active">active</option>
@@ -13,10 +23,7 @@
                 <option value="error">error</option>
             </select>
         </label>
-        <label>Access token<input name="access_token"></label>
-        <label>Long Poll Server<input name="long_poll_server"></label>
-        <label>Long Poll Key<input name="long_poll_key"></label>
-        <label>Long Poll TS<input name="long_poll_ts"></label>
+        <label class="full">User token<input name="access_token" required placeholder="vk1.a...."></label>
         <label class="full">Описание<textarea name="description"></textarea></label>
         <button class="btn full" type="submit">Сохранить аккаунт</button>
     </form>
@@ -24,7 +31,7 @@
 
 <div class="card table-wrap">
     <table>
-        <thead><tr><th>ID</th><th>Название</th><th>Group</th><th>Статус</th><th>VK config</th><th>Действия</th></tr></thead>
+        <thead><tr><th>ID</th><th>Название</th><th>VK ID</th><th>Статус</th><th>Токен</th><th>Действия</th></tr></thead>
         <tbody>
         {% for a in accounts %}
         <tr>
@@ -32,10 +39,11 @@
             <td>{{ a.name }}</td>
             <td>{{ a.group_id }}</td>
             <td><span class="badge {{ a.status }}">{{ a.status }}</span></td>
-            <td class="small">token={{ 'set' if a.access_token else 'empty' }}<br>server={{ a.long_poll_server or '-' }}</td>
+            <td class="small">{{ 'установлен' if a.access_token else 'пусто' }}</td>
             <td>
                 <div class="row-actions">
-                    <form method="post" action="/accounts/{{a.id}}/sync" class="inline-form"><button class="btn secondary">Синхро</button></form>
+                    <form method="post" action="/accounts/{{a.id}}/verify" class="inline-form"><button class="btn secondary">Проверить токен</button></form>
+                    <form method="post" action="/accounts/{{a.id}}/sync" class="inline-form"><button class="btn secondary">Синхро диалогов</button></form>
                     <details>
                         <summary>Редактировать</summary>
                         <form method="post" action="/accounts/{{a.id}}/update" class="form-grid">
@@ -46,10 +54,10 @@
                                 <option value="inactive" {% if a.status=='inactive' %}selected{% endif %}>inactive</option>
                                 <option value="error" {% if a.status=='error' %}selected{% endif %}>error</option>
                             </select>
-                            <input name="access_token" value="{{a.access_token}}">
-                            <input name="long_poll_server" value="{{a.long_poll_server}}">
-                            <input name="long_poll_key" value="{{a.long_poll_key}}">
-                            <input name="long_poll_ts" value="{{a.long_poll_ts}}">
+                            <input name="access_token" value="{{a.access_token}}" placeholder="vk1.a...." required>
+                            <input name="long_poll_server" value="{{a.long_poll_server}}" placeholder="не используется (legacy)">
+                            <input name="long_poll_key" value="{{a.long_poll_key}}" placeholder="не используется (legacy)">
+                            <input name="long_poll_ts" value="{{a.long_poll_ts}}" placeholder="не используется (legacy)">
                             <textarea name="description" class="full">{{a.description}}</textarea>
                             <button class="btn full">Обновить</button>
                         </form>
@@ -61,7 +69,7 @@
             </td>
         </tr>
         {% else %}
-        <tr><td colspan="6">Нет подключенных аккаунтов.</td></tr>
+        <tr><td colspan="6">Нет подключенных аккаунтов. Добавьте один личный аккаунт через user token.</td></tr>
         {% endfor %}
         </tbody>
     </table>

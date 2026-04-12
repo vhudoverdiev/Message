@@ -21,10 +21,10 @@
     <div class="card">
         <h3>VK Integration pointers</h3>
         <ul>
-            <li>Храните <code>access_token</code> в аккаунтах VK.</li>
-            <li><code>group_id</code> — ID сообщества/приложения.</li>
-            <li>Long poll данные: <code>long_poll_server</code>, <code>long_poll_key</code>, <code>long_poll_ts</code>.</li>
-            <li>Реальные вызовы добавляются в <code>app/services/vk_service.py</code>.</li>
+            <li>Используется ручное подключение личного аккаунта через <code>user token</code>.</li>
+            <li>VK ID OAuth в этом этапе не используется.</li>
+            <li>Проверка токена: <code>users.get</code>.</li>
+            <li>Синхронизация диалогов: <code>messages.getConversations</code>.</li>
         </ul>
     </div>
 </div>
