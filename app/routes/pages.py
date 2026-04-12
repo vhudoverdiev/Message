@@ -46,6 +46,10 @@ def create_account(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    if db.query(VKAccount).count() >= 1:
+        write_log(db, action='VK_ACCOUNT_CREATE_BLOCKED', details='Разрешен только один личный VK аккаунт', level='WARNING', user_id=current_user.id)
+        return RedirectResponse('/accounts', status_code=303)
+
     account = VKAccount(
         name=name,
         group_id=group_id,
@@ -60,6 +64,22 @@ def create_account(
     db.add(account)
     db.commit()
     write_log(db, action='VK_ACCOUNT_CREATE', details=f'Создан VK аккаунт {name}', user_id=current_user.id)
+    return RedirectResponse('/accounts', status_code=303)
+
+
+@router.post('/accounts/{account_id}/verify')
+def verify_account_token(account_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    account = db.query(VKAccount).filter(VKAccount.id == account_id).first()
+    if not account:
+        return RedirectResponse('/accounts', status_code=303)
+
+    vk_service = VKService(db)
+    is_ok, status_text = vk_service.validate_connection(account)
+    account.status = 'active' if is_ok else 'error'
+    log_action = 'VK_TOKEN_VERIFY' if is_ok else 'VK_TOKEN_VERIFY_ERROR'
+    log_level = 'INFO' if is_ok else 'ERROR'
+    write_log(db, action=log_action, details=f'{account.name}: {status_text}', level=log_level, user_id=current_user.id)
+    db.commit()
     return RedirectResponse('/accounts', status_code=303)
 
 
@@ -110,9 +130,23 @@ def sync_account(account_id: int, db: Session = Depends(get_db), current_user: U
         vk_service = VKService(db)
         is_ok, status_text = vk_service.validate_connection(account)
         if is_ok:
-            vk_service.sync_messages_stub(account)
-            account.status = 'active'
-            write_log(db, action='VK_SYNC', details=f'Синхронизация аккаунта {account.name} выполнена', user_id=current_user.id)
+            sync_ok, _, sync_text = vk_service.sync_dialogs(account)
+            account.status = 'active' if sync_ok else 'error'
+            if sync_ok:
+                write_log(
+                    db,
+                    action='VK_SYNC',
+                    details=f'{account.name}: {sync_text}',
+                    user_id=current_user.id,
+                )
+            else:
+                write_log(
+                    db,
+                    action='VK_SYNC_ERROR',
+                    details=f'{account.name}: {sync_text}',
+                    level='ERROR',
+                    user_id=current_user.id,
+                )
         else:
             account.status = 'error'
             write_log(db, action='VK_SYNC_ERROR', details=f'{account.name}: {status_text}', level='ERROR', user_id=current_user.id)

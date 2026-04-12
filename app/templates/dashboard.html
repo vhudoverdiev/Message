@@ -9,16 +9,16 @@
 </div>
 <div class="grid-2">
     <div class="card">
-        <h3>Быстрый старт VK интеграции</h3>
+        <h3>Быстрый старт (этап 15, личный аккаунт)</h3>
         <ol>
-            <li>Добавьте VK аккаунт на странице «VK аккаунты».</li>
-            <li>Укажите <b>access_token</b>, <b>group_id</b> и long poll поля.</li>
-            <li>Нажмите «Синхронизировать», чтобы проверить подключение.</li>
+            <li>Откройте страницу «VK аккаунты» и добавьте один аккаунт вручную.</li>
+            <li>Вставьте <b>user token</b> (без VK ID OAuth).</li>
+            <li>Нажмите «Проверить токен», затем «Синхро диалогов».</li>
         </ol>
     </div>
     <div class="card">
         <h3>Статус</h3>
-        <p>Проект готов для локального запуска. Для реального VK API замените методы в <code>app/services/vk_service.py</code>.</p>
+        <p>Сервис уже использует рабочую схему user token: проверка через <code>users.get</code> и синхронизация через <code>messages.getConversations</code>.</p>
     </div>
 </div>
 {% endblock %}

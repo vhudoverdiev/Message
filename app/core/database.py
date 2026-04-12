@@ -6,9 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.core.config import settings
 from app.models import base, user
 from app.models.client import Client
-from app.models.message import Message
 from app.models.setting import Setting
-from app.models.vk_account import VKAccount
 from app.services.auth_service import hash_password
 
 is_sqlite = settings.database_url.startswith('sqlite')
@@ -52,38 +50,14 @@ def seed_admin_user() -> None:
 def seed_demo_data() -> None:
     db = SessionLocal()
     try:
-        if not db.query(VKAccount).first():
-            account = VKAccount(
-                name='Main Store',
-                group_id='club123456',
-                status='active',
-                access_token='demo_token_here',
-                long_poll_server='https://lp.vk.com/demo',
-                long_poll_key='demo_key',
-                long_poll_ts='1',
-                description='Демо аккаунт для старта',
-            )
-            db.add(account)
-            db.flush()
-
-            client = Client(
+        if not db.query(Client).first():
+            db.add(Client(
                 full_name='Иван Петров',
                 vk_link='https://vk.com/id1',
                 vk_user_id='1',
                 tags='new,vip',
                 status='new',
                 notes='Нужна консультация',
-            )
-            db.add(client)
-            db.flush()
-
-            db.add(Message(
-                vk_account_id=account.id,
-                client_id=client.id,
-                dialog_id='dialog_1',
-                direction='in',
-                text='Здравствуйте, интересует цена.',
-                is_read=False,
             ))
 
         if not db.query(Setting).first():
