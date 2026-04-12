@@ -26,7 +26,28 @@ cp .env.example .env
 uvicorn app.main:app --reload
 ```
 
+Альтернатива (теперь поддерживается):
+```bash
+python run.py
+```
+
 Откройте: `http://127.0.0.1:8000`
+
+## Почему не запускается (`python run.py`)
+Если видите ошибку `can't open file ... run.py: [Errno 2] No such file or directory`, значит в проекте не было `run.py`.
+
+Теперь доступны оба варианта запуска:
+1. `python run.py`
+2. `uvicorn app.main:app --reload`
+
+Для Windows PowerShell:
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env
+python run.py
+```
 
 ## Данные доступа
 - login: `admin`
