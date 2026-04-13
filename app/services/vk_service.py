@@ -23,11 +23,12 @@ class VKService:
         if not account.access_token:
             return False, 'Токен отсутствует'
 
-        ok, payload = self._vk_api_request('users.get', account.access_token)
+        ok, payload = self._vk_api_request('users.get', account.access_token, {'fields': 'photo_100'})
         if not ok:
             return False, payload
 
         user = payload[0]
+        account.avatar_url = user.get('photo_100', '') or ''
         full_name = f"{user.get('first_name', '').strip()} {user.get('last_name', '').strip()}".strip()
         return True, f'Токен подтвержден: {full_name or "VK user"}'
 

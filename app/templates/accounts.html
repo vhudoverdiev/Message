@@ -31,11 +31,20 @@
 
 <div class="card table-wrap">
     <table>
-        <thead><tr><th>ID</th><th>Название</th><th>VK ID</th><th>Статус</th><th>Токен</th><th>Действия</th></tr></thead>
+        <thead><tr><th>ID</th><th>Аватар</th><th>Название</th><th>VK ID</th><th>Статус</th><th>Токен</th><th>Действия</th></tr></thead>
         <tbody>
         {% for a in accounts %}
         <tr>
             <td>{{ a.id }}</td>
+            <td>
+                <div class="avatar-thumb">
+                    {% if a.avatar_url %}
+                    <img src="{{ a.avatar_url }}" alt="avatar {{ a.name }}" loading="lazy">
+                    {% else %}
+                    <span>{{ (a.name[:1] if a.name else '?')|upper }}</span>
+                    {% endif %}
+                </div>
+            </td>
             <td>{{ a.name }}</td>
             <td>{{ a.group_id }}</td>
             <td><span class="badge {{ a.status }}">{{ a.status }}</span></td>
@@ -69,7 +78,7 @@
             </td>
         </tr>
         {% else %}
-        <tr><td colspan="6">Нет подключенных аккаунтов. Добавьте один личный аккаунт через user token.</td></tr>
+        <tr><td colspan="7">Нет подключенных аккаунтов. Добавьте один личный аккаунт через user token.</td></tr>
         {% endfor %}
         </tbody>
     </table>

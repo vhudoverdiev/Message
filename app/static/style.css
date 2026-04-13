@@ -17,6 +17,7 @@ body {
     font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg);
     color: var(--text);
+    overflow-x: hidden;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -147,6 +148,26 @@ textarea { min-height: 90px; resize: vertical; }
 .badge.done { background: #dcfce7; color: #166534; }
 
 .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.avatar-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #dbeafe;
+    color: #1e3a8a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.avatar-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.02);
+}
 
 .error { background: #fee2e2; color: #991b1b; padding: 8px 10px; border-radius: 8px; margin-bottom: 10px; }
 .small { font-size: 12px; color: var(--muted); }

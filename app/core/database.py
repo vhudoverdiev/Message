@@ -1,6 +1,7 @@
 from collections.abc import Generator
 
 from sqlalchemy import create_engine
+from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
@@ -24,8 +25,30 @@ def get_db() -> Generator[Session, None, None]:
 
 def init_db() -> None:
     base.Base.metadata.create_all(bind=engine)
+    ensure_schema_updates()
     seed_admin_user()
     seed_demo_data()
+
+
+def ensure_schema_updates() -> None:
+    """Мягкие schema-обновления для уже существующей SQLite/PostgreSQL базы."""
+    with engine.begin() as connection:
+        if engine.dialect.name == 'sqlite':
+            columns = {
+                row[1]
+                for row in connection.execute(text('PRAGMA table_info(vk_accounts)')).fetchall()
+            }
+            if 'avatar_url' not in columns:
+                connection.execute(text("ALTER TABLE vk_accounts ADD COLUMN avatar_url VARCHAR(500) DEFAULT ''"))
+        else:
+            exists = connection.execute(text("""
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_name='vk_accounts' AND column_name='avatar_url'
+                LIMIT 1
+            """)).first()
+            if not exists:
+                connection.execute(text("ALTER TABLE vk_accounts ADD COLUMN avatar_url VARCHAR(500) DEFAULT ''"))
 
 
 def seed_admin_user() -> None:
