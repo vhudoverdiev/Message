@@ -18,6 +18,7 @@ class VKAccount(Base):
     long_poll_key: Mapped[str] = mapped_column(String(255), default='')
     long_poll_ts: Mapped[str] = mapped_column(String(100), default='')
     description: Mapped[str] = mapped_column(Text, default='')
+    avatar_url: Mapped[str] = mapped_column(String(500), default='')
     owner_id: Mapped[int | None] = mapped_column(ForeignKey('users.id'), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

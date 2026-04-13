@@ -57,7 +57,10 @@ python run.py
 В `.env`:
 ```env
 DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/vk_crm
+STATIC_ASSET_VERSION=1
 ```
+
+Если после деплоя вы видите старые стили/JS, увеличьте `STATIC_ASSET_VERSION` (например, `2`) и перезапустите сервис — это принудительно обновит кэш статических файлов в браузере.
 
 ## Этап 15: как подключить личный аккаунт (manual user token)
 1. Войдите в CRM под `admin`.

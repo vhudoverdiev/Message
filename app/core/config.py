@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     admin_password: str = 'admin123'
     vk_default_api_version: str = '5.199'
     vk_default_poll_wait: int = 25
+    static_asset_version: str = '1'
 
 
 settings = Settings()

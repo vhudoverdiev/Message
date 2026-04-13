@@ -4,11 +4,13 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.config import settings
 from app.services.auth_service import authenticate_user
 from app.services.log_service import write_log
 
 router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
+templates.env.globals['static_asset_version'] = settings.static_asset_version
 
 
 @router.get('/')

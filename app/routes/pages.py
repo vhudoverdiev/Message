@@ -5,6 +5,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.config import settings
 from app.models.client import Client
 from app.models.log_entry import LogEntry
 from app.models.message import Message
@@ -18,6 +19,7 @@ from app.services.vk_service import VKService
 
 router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
+templates.env.globals['static_asset_version'] = settings.static_asset_version
 
 
 @router.get('/dashboard')
