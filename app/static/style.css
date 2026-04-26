@@ -412,3 +412,51 @@ select:focus-visible {
     .grid-4, .grid-3, .grid-2, .form-grid { grid-template-columns: 1fr; }
     .topbar-actions { width: 100%; justify-content: flex-end; }
 }
+
+.notifications-card {
+    padding: 10px;
+}
+
+.notifications-list {
+    display: grid;
+    gap: 10px;
+}
+
+.notification-tab {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    background: var(--panel-solid);
+    transition: transform .2s ease, border-color .2s ease;
+}
+
+.notification-tab:hover {
+    transform: translateY(-1px);
+    border-color: rgba(79, 70, 229, 0.42);
+}
+
+.count-circle {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+    background: linear-gradient(120deg, var(--primary), var(--primary-2));
+}
+
+.count-circle.empty {
+    background: #cbd5e1;
+}
+
+.notification-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
