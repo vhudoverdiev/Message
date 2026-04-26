@@ -8,7 +8,7 @@
 <div class="card notifications-card">
     <div class="notifications-list">
         {% for notification in stats.notifications.values() %}
-        <a class="notification-tab" href="{{ notification.link }}">
+        <a class="notification-tab js-notification-tab" href="{{ notification.link }}" data-target="{{ notification.link }}">
             {% if notification.count > 0 %}
             <span class="count-circle" aria-label="Новых: {{ notification.count }}">{{ notification.count }}</span>
             {% else %}

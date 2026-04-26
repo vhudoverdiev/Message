@@ -9,30 +9,33 @@
 <body>
 <div class="app-shell">
     <aside class="sidebar">
-        <div class="brand">VK CRM</div>
-        <nav class="menu">
-            <a href="/dashboard" class="{% if request.url.path in ['/', '/dashboard'] %}active{% endif %}">Уведомления</a>
-            <a href="/accounts" class="{% if '/accounts' in request.url.path %}active{% endif %}">VK аккаунты</a>
-            <a href="/messages" class="{% if '/messages' in request.url.path %}active{% endif %}">Сообщения</a>
-            <a href="/gmail" class="{% if '/gmail' in request.url.path %}active{% endif %}">Gmail</a>
-            <a href="/telegram" class="{% if '/telegram' in request.url.path %}active{% endif %}">Telegram</a>
-            <a href="/logs" class="{% if '/logs' in request.url.path %}active{% endif %}">Логи</a>
-            <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}">Пользователи</a>
-        </nav>
-    </aside>
-    <main class="main">
-        <header class="topbar">
-            <div>
+        <div>
+            <div class="brand">VK CRM</div>
+            <nav class="menu">
+                <a href="/dashboard" class="{% if request.url.path in ['/', '/dashboard'] %}active{% endif %}">Уведомления</a>
+                <a href="/accounts" class="{% if '/accounts' in request.url.path %}active{% endif %}">VK аккаунты</a>
+                <a href="/messages" class="{% if '/messages' in request.url.path %}active{% endif %}">Сообщения</a>
+                <a href="/gmail" class="{% if '/gmail' in request.url.path %}active{% endif %}">Gmail</a>
+                <a href="/telegram" class="{% if '/telegram' in request.url.path %}active{% endif %}">Telegram</a>
+                <a href="/logs" class="{% if '/logs' in request.url.path %}active{% endif %}">Логи</a>
+                <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}">Пользователи</a>
+            </nav>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="account-panel">
                 <strong>{{ current_user.full_name }}</strong>
                 <div class="small">@{{ current_user.username }} • {{ current_user.role }}</div>
             </div>
-            <div class="topbar-actions">
-                <button class="btn secondary icon-btn" type="button" id="theme-toggle" aria-label="Переключить тему">🌙</button>
-                <form action="/logout" method="post" class="inline-form">
+            <div class="sidebar-footer-actions">
+                <button class="btn secondary icon-btn sidebar-icon-btn" type="button" id="theme-toggle" aria-label="Переключить тему">🌙</button>
+                <form action="/logout" method="post" class="inline-form sidebar-logout-form">
                     <button class="btn secondary" type="submit">Выход</button>
                 </form>
             </div>
-        </header>
+        </div>
+    </aside>
+    <main class="main">
         {% block content %}{% endblock %}
     </main>
 </div>
