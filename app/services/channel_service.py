@@ -35,6 +35,63 @@ class ChannelService:
         self.db.commit()
         return account
 
+    def create_vk_account(self, name: str, group_id: str, access_token: str) -> ChannelAccount:
+        return self.upsert_account('vk', None, name=name, external_id=group_id, token=access_token)
+
+    def update_vk_account(self, account: ChannelAccount, name: str, group_id: str, access_token: str) -> ChannelAccount:
+        token = TokenCipher.decrypt(account.token_encrypted) if not access_token else access_token
+        return self.upsert_account('vk', account.id, name=name, external_id=group_id, token=token or '')
+
+    def verify_vk_account(self, account: ChannelAccount) -> tuple[bool, str]:
+        token = TokenCipher.decrypt(account.token_encrypted)
+        if not token:
+            account.status = 'inactive'
+            self.db.commit()
+            return False, 'Токен сообщества отсутствует.'
+
+        params = urlencode({'access_token': token, 'v': '5.199'})
+        ok, data = self._request_json(f'https://api.vk.com/method/groups.getById?{params}')
+        if not ok:
+            account.status = 'error'
+            self.db.commit()
+            return False, str(data)
+        if data.get('error'):
+            account.status = 'error'
+            self.db.commit()
+            return False, data['error'].get('error_msg', 'VK API error')
+
+        account.status = 'active'
+        self.db.commit()
+        return True, 'Токен сообщества валиден.'
+
+    def sync_vk_account(self, account: ChannelAccount) -> tuple[bool, str]:
+        verified, message = self.verify_vk_account(account)
+        if not verified:
+            return False, message
+        ok, details = self.sync_vk(account)
+        account.status = 'active' if ok else 'error'
+        self.db.commit()
+        return ok, details
+
+    def delete_vk_account(self, account: ChannelAccount) -> None:
+        self.db.query(ChannelMessage).filter(
+            ChannelMessage.channel == 'vk',
+            ChannelMessage.account_id == account.id,
+        ).delete(synchronize_session=False)
+        self.db.delete(account)
+        self.db.commit()
+
+    @staticmethod
+    def classify_vk_priority(text: str) -> str:
+        body = (text or '').lower()
+        high_keywords = ('срочно', 'urgent', 'ошибка', 'возврат', 'жалоба', 'проблема')
+        low_keywords = ('спасибо', 'ок', 'понятно', 'принято')
+        if any(word in body for word in high_keywords):
+            return 'high'
+        if any(word in body for word in low_keywords):
+            return 'low'
+        return 'medium'
+
     def sync_gmail(self, account: ChannelAccount, search_query: str = '') -> tuple[bool, str]:
         token = TokenCipher.decrypt(account.token_encrypted)
         if not token:
