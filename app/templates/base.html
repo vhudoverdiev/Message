@@ -11,7 +11,7 @@
     <aside class="sidebar">
         <div class="brand">VK CRM</div>
         <nav class="menu">
-            <a href="/dashboard" class="{% if request.url.path in ['/', '/dashboard'] %}active{% endif %}">Дашборд</a>
+            <a href="/dashboard" class="{% if request.url.path in ['/', '/dashboard'] %}active{% endif %}">Уведомления</a>
             <a href="/accounts" class="{% if '/accounts' in request.url.path %}active{% endif %}">VK аккаунты</a>
             <a href="/messages" class="{% if '/messages' in request.url.path %}active{% endif %}">Сообщения</a>
             <a href="/gmail" class="{% if '/gmail' in request.url.path %}active{% endif %}">Gmail</a>

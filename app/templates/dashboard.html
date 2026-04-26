@@ -1,80 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
 <section class="page-header">
-    <h1>CRM Evolution · Wave 1</h1>
-    <p>Запускаем большой апгрейд продукта: более премиальный UX/UI, умная логика и измеримый рост эффективности команды.</p>
-    <div class="roadmap-pill">Этап 5 из 30 · Клиент 360° + таймлайн касаний</div>
+    <h1>Уведомления</h1>
+    <p>Сводка по новым сообщениям и уведомлениям из основных каналов.</p>
 </section>
 
-<div class="grid-4">
-    <div class="card kpi-card">
-        <div class="kpi-title">VK аккаунты</div>
-        <div class="kpi-value">{{ stats.accounts }}</div>
-        <div class="kpi-meta">Подключены к единому inbox</div>
-    </div>
-    <div class="card kpi-card">
-        <div class="kpi-title">Новые сообщения</div>
-        <div class="kpi-value">{{ stats.new_messages }}</div>
-        <div class="kpi-meta">Необработанные лиды и обращения</div>
-    </div>
-    <div class="card kpi-card">
-        <div class="kpi-title">Клиенты</div>
-        <div class="kpi-value">{{ stats.clients }}</div>
-        <div class="kpi-meta">Контакты в воронке</div>
-    </div>
-    <div class="card kpi-card">
-        <div class="kpi-title">Активные диалоги</div>
-        <div class="kpi-value">{{ stats.dialogs }}</div>
-        <div class="kpi-meta">Диалоги с живыми задачами</div>
-    </div>
-</div>
-
-<div class="grid-2">
-    <div class="card">
-        <h3>Этап 5 (внедрено в этом релизе)</h3>
-        <ol class="roadmap-list">
-            <li>Запущена карточка клиента 360° с отдельным экраном профиля.</li>
-            <li>Добавлен единый таймлайн касаний, объединяющий client event, legacy сообщения и unified VK inbox сообщения.</li>
-            <li>В карточке отображаются source-метки, read/unread статусы и приоритеты triage для unified-сообщений.</li>
-            <li>В списке клиентов добавлена кнопка быстрого перехода в карточку «Карточка 360°».</li>
-        </ol>
-        <div class="progress-track" aria-label="Прогресс дорожной карты"><span style="width: 16.66%"></span></div>
-        <p class="small">Прогресс: 5 / 30 этапов (16.66%).</p>
-    </div>
-    <div class="card">
-        <h3>Дорожная карта улучшений (30 этапов)</h3>
-        <ol class="roadmap-list">
-            <li><b>Visual Foundation 2.0</b> — premium UI-kit, обновлённый дашборд и дизайн-система.</li>
-            <li>Глобальная типографика и токены темы (Light/Dark + брендинг).</li>
-            <li>Умный глобальный поиск (клиенты, сообщения, сделки).</li>
-            <li>Inbox 2.0 с фильтрами по приоритету и SLA.</li>
-            <li>Карточка клиента 360° с таймлайном касаний.</li>
-            <li>Сегментация клиентской базы (теги, статусы, score).</li>
-            <li>Pipeline сделок с drag-and-drop стадиями.</li>
-            <li>Автоматические правила маршрутизации лидов.</li>
-            <li>Шаблоны сообщений + AI-подсказки ответов.</li>
-            <li>Авто-назначение ответственных по нагрузке.</li>
-            <li>SLA-таймеры и оповещения о риске просрочки.</li>
-            <li>Финальный activity feed по всем каналам.</li>
-            <li>Единый центр задач и follow-up напоминаний.</li>
-            <li>Улучшенный модуль ролей и прав доступа.</li>
-            <li>Журнал аудита действий сотрудников.</li>
-            <li>Продвинутая аналитика конверсии воронки.</li>
-            <li>Когортный анализ и retention-метрики.</li>
-            <li>Финансовая аналитика (LTV, CAC, ROMI).</li>
-            <li>Интеграции с телефонией и email-трекером.</li>
-            <li>Webhook framework и API для внешних сервисов.</li>
-            <li>Конструктор автоматизаций (if/then сценарии).</li>
-            <li>A/B тестирование шаблонов коммуникаций.</li>
-            <li>Умный календарь встреч и загрузки менеджеров.</li>
-            <li>Мобильная адаптация и PWA-режим.</li>
-            <li>Performance-оптимизация (кэш, lazy loading).</li>
-            <li>Feature flags и безопасные релизные циклы.</li>
-            <li>Инструменты качества данных и дедупликации.</li>
-            <li>NPS/CSAT-опросы и контроль качества сервиса.</li>
-            <li>Self-service портал для клиентов.</li>
-            <li>Финальный polishing: micro-interactions и UX-мелочи уровня enterprise.</li>
-        </ol>
+<div class="card notifications-card">
+    <div class="notifications-list">
+        {% for notification in stats.notifications.values() %}
+        <a class="notification-tab" href="{{ notification.link }}">
+            {% if notification.count > 0 %}
+            <span class="count-circle" aria-label="Новых: {{ notification.count }}">{{ notification.count }}</span>
+            {% else %}
+            <span class="count-circle empty" aria-hidden="true">0</span>
+            {% endif %}
+            <span class="notification-main">
+                <strong>{{ notification.title }}</strong>
+                {% if notification.count > 0 %}
+                <span class="small">Есть {{ notification.count }} новых.</span>
+                {% else %}
+                <span class="small">{{ notification.empty_text }}.</span>
+                {% endif %}
+            </span>
+        </a>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
