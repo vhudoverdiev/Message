@@ -11,35 +11,83 @@
     <aside class="sidebar">
         <div>
             <div class="brand">
-                <span class="brand-logo" aria-hidden="true">VK</span>
+                <span class="brand-logo" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 6.8c0-1.7 0-2.5.52-3.02C5.04 3.26 5.84 3.26 7.42 3.26h9.16c1.58 0 2.38 0 2.9.52.52.52.52 1.32.52 2.9v9.16c0 1.58 0 2.38-.52 2.9-.52.52-1.32.52-2.9.52H7.42c-1.58 0-2.38 0-2.9-.52C4 18.22 4 17.42 4 15.84V6.8z" fill="url(#vkLogoGradient)"/>
+                        <path d="M8.1 14.9h1.8c3.2 0 5.1-2.3 5.2-6.2h-1.7c-.1 2.9-1.3 4.1-2.2 4.4V8.7h-1.6v2.6c-.9-.2-2.1-1.3-2.2-2.6H6c.2 2.2 1.7 3.4 2.8 3.9l-2.1 2.3h1.4z" fill="white"/>
+                        <defs>
+                            <linearGradient id="vkLogoGradient" x1="4" y1="3.26" x2="20" y2="19.26" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#8C7BFF"/>
+                                <stop offset="1" stop-color="#0A7CFF"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </span>
                 <span>VK CRM</span>
             </div>
             <nav class="menu">
-                <a href="/dashboard" class="{% if request.url.path in ['/', '/dashboard'] %}active{% endif %}"><span class="menu-icon">🔔</span>Уведомления</a>
-                <a href="/accounts" class="{% if '/accounts' in request.url.path %}active{% endif %}"><span class="menu-icon">vk</span>VK аккаунты</a>
-                <a href="/messages" class="{% if '/messages' in request.url.path %}active{% endif %}"><span class="menu-icon">💬</span>Сообщения</a>
-                <a href="/gmail" class="{% if '/gmail' in request.url.path %}active{% endif %}"><span class="menu-icon">✉</span>Gmail</a>
-                <a href="/telegram" class="{% if '/telegram' in request.url.path %}active{% endif %}"><span class="menu-icon">➤</span>Telegram</a>
-                <a href="/logs" class="{% if '/logs' in request.url.path %}active{% endif %}"><span class="menu-icon">🧾</span>Логи</a>
-                <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}"><span class="menu-icon">👥</span>Пользователи</a>
+                <a href="/dashboard" class="{% if request.url.path in ['/', '/dashboard'] %}active{% endif %}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 17a2.5 2.5 0 0 0 5 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </span>
+                    Уведомления
+                </a>
+                <a href="/accounts" class="{% if '/accounts' in request.url.path %}active{% endif %}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M4.5 8.5c0-1.3 0-2 .41-2.4.4-.41 1.1-.41 2.4-.41h9.38c1.3 0 2 0 2.4.41.41.4.41 1.1.41 2.4v7c0 1.3 0 2-.41 2.4-.4.41-1.1.41-2.4.41H7.31c-1.3 0-2 0-2.4-.41-.41-.4-.41-1.1-.41-2.4v-7z" fill="currentColor" opacity=".2"/><path d="M7.8 9.2h1.7c.3 1.5 1.4 2.8 2.8 3.5v-3h1.5v3c1.2-.4 2.5-1.8 2.8-3.5h1.5c-.2 2.8-2.1 4.5-3.8 5.1h-1.1C10.2 13.7 8.1 12.2 7.8 9.2z" fill="currentColor"/></svg>
+                    </span>
+                    VK аккаунты
+                </a>
+                <a href="/messages" class="{% if '/messages' in request.url.path %}active{% endif %}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M20 11.5a8 8 0 0 1-8 8H7l-3 2v-5a8 8 0 1 1 16-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </span>
+                    Сообщения
+                </a>
+                <a href="/gmail" class="{% if '/gmail' in request.url.path %}active{% endif %}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M4 7.5c0-1.1.9-2 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9z" stroke="currentColor" stroke-width="2"/><path d="m5 8 7 5 7-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    Gmail
+                </a>
+                <a href="/telegram" class="{% if '/telegram' in request.url.path %}active{% endif %}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M20.5 4.5 3.8 10.9c-1.1.4-1 2 .2 2.3l4.3 1.2 1.2 4.3c.3 1.2 1.9 1.3 2.3.2l6.4-16.7c.4-1.1-.7-2.2-1.8-1.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m8.4 14.4 4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    </span>
+                    Telegram
+                </a>
+                <a href="/logs" class="{% if '/logs' in request.url.path %}active{% endif %}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M7 3.5h8l4 4v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="2"/><path d="M15 3.5v4h4M9 12h6M9 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </span>
+                    Логи
+                </a>
+                <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M8.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM16 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM3.5 19c0-2.2 2.2-4 5-4s5 1.8 5 4M13 19c.4-1.4 1.9-2.5 3.7-2.5 2 0 3.8 1.3 3.8 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </span>
+                    Пользователи
+                </a>
             </nav>
         </div>
 
-        <div class="sidebar-footer">
+        <div class="sidebar-bottom">
             <div class="account-panel">
-                <div class="account-avatar" aria-hidden="true">Ж</div>
+                <div class="account-avatar" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M4.5 6.8c0-1.3 0-2 .41-2.4.4-.41 1.1-.41 2.4-.41h9.38c1.3 0 2 0 2.4.41.41.4.41 1.1.41 2.4v7c0 1.3 0 2-.41 2.4-.4.41-1.1.41-2.4.41H7.31c-1.3 0-2 0-2.4-.41-.41-.4-.41-1.1-.41-2.4v-7z" fill="#2E7BFF"/><path d="M7.8 9.2h1.7c.3 1.5 1.4 2.8 2.8 3.5v-3h1.5v3c1.2-.4 2.5-1.8 2.8-3.5h1.5c-.2 2.8-2.1 4.5-3.8 5.1h-1.1C10.2 13.7 8.1 12.2 7.8 9.2z" fill="white"/></svg>
+                </div>
                 <div class="account-meta">
                     <strong>{{ current_user.full_name }}</strong>
                     <div class="small">@{{ current_user.username }} · {{ current_user.role }}</div>
                 </div>
             </div>
-            <label class="theme-switch-row" for="theme-toggle-switch">
-                <span>Тёмная тема</span>
-                <input id="theme-toggle-switch" type="checkbox" class="theme-switch-input">
-                <span class="theme-switch-slider" aria-hidden="true"></span>
-            </label>
             <form action="/logout" method="post" class="inline-form sidebar-logout-form">
-                <button class="btn logout-btn" type="submit">⎋ Выйти</button>
+                <button class="btn logout-btn" type="submit">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M10 6H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m14 16 4-4-4-4M18 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    Выйти
+                </button>
             </form>
         </div>
     </aside>
