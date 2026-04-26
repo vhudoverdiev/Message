@@ -1,46 +1,45 @@
 {% extends 'base.html' %}
 {% block content %}
-<section class="page-header">
-    <h1>Уведомления</h1>
-    <p>Сводка по новым сообщениям и уведомлениям из основных каналов.</p>
+<section class="page-header dashboard-header">
+    <div>
+        <h1>Уведомления</h1>
+        <p>Сводка по новым сообщениям и уведомлениям из основных каналов.</p>
+    </div>
+    <div class="dashboard-controls">
+        <button class="header-chip" type="button">📅&nbsp;&nbsp;26 мая 2025, 00:02</button>
+        <button class="header-chip profile-chip" type="button">
+            <span class="profile-badge">SA<span class="profile-dot"></span></span>
+            <span class="chevron">⌄</span>
+        </button>
+    </div>
 </section>
 
-<div class="card notifications-card">
-    <div class="notifications-list">
-        {% for channel, notification in stats.notifications.items() %}
-        <a class="notification-tab js-notification-tab" href="{{ notification.link }}" data-target="{{ notification.link }}">
-            <span class="notification-icon-box notification-icon-{{ channel }}" aria-hidden="true">
-                {% if channel == 'vk' %}
-                <svg viewBox="0 0 24 24" role="img" focusable="false">
-                    <path d="M4.2 7.2c.15-.7.57-1.05 1.27-1.05h1.92c.56 0 .93.26 1.1.77l1.06 3.2c.16.44.44.5.72.17l2.11-2.6c.34-.42.75-.62 1.23-.62h1.82c.52 0 .83.19.95.56.11.38-.03.76-.42 1.13l-2.36 2.3c-.33.32-.33.62 0 .92l2.52 2.52c.36.36.49.72.38 1.09-.11.37-.42.55-.95.55h-1.57c-.58 0-1.03-.21-1.35-.64l-1.72-2.24c-.3-.37-.58-.34-.84.08l-.36.6c-.18.31-.27.64-.27.99v.26c0 .62-.31.93-.93.93H6.2c-.76 0-1.2-.36-1.32-1.1-.17-1.04-.29-2.1-.36-3.18-.07-1.08-.06-2.13.02-3.16.02-.23.05-.45.1-.68z" />
-                </svg>
-                {% elif channel == 'telegram' %}
-                <svg viewBox="0 0 24 24" role="img" focusable="false">
-                    <path d="M20.54 4.53a1.32 1.32 0 0 0-1.35-.21L4.18 10.05c-.65.25-.63 1.17.03 1.39l3.87 1.32 1.45 4.5c.2.63 1 .8 1.44.32l2.22-2.42 4.36 3.18c.57.41 1.36.08 1.49-.62l2.52-12.7a1.29 1.29 0 0 0-.52-1.29zm-3.19 3.2-6.16 5.47a.73.73 0 0 0-.23.42l-.3 2.26-.83-2.59a.72.72 0 0 0-.43-.45l-2.55-.87 10.6-4.1-.1-.14z" />
-                </svg>
-                {% else %}
-                <svg viewBox="0 0 24 24" role="img" focusable="false">
-                    <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5v-11zm2.03-.5a.5.5 0 0 0-.5.5v.53l6.47 4.31 6.47-4.31V6.5a.5.5 0 0 0-.5-.5h-11zm12.44 3.15-5.95 3.97a.9.9 0 0 1-1 0L5.57 9.15v8.35c0 .28.22.5.5.5h11.9c.28 0 .5-.22.5-.5V9.15z" />
-                </svg>
-                {% endif %}
-            </span>
-
-            <span class="notification-main">
-                <strong>{{ notification.title }}</strong>
-                {% if notification.count > 0 %}
-                <span class="small">Есть {{ notification.count }} новых.</span>
-                {% else %}
-                <span class="small">{{ notification.empty_text }}.</span>
-                {% endif %}
-            </span>
-
+<div class="dashboard-stat-grid">
+    {% for channel, notification in stats.notifications.items() %}
+    <a class="dashboard-stat-card" href="{{ notification.link }}">
+        <span class="dashboard-stat-icon channel-{{ channel }}">
+            {% if channel == 'vk' %}VK{% elif channel == 'telegram' %}✈{% else %}M{% endif %}
+        </span>
+        <span class="dashboard-stat-content">
+            <strong>{{ notification.count }}</strong>
+            <span>{{ notification.title }}</span>
             {% if notification.count > 0 %}
-            <span class="count-circle" aria-label="Новых: {{ notification.count }}">{{ notification.count }}</span>
+            <small>Есть {{ notification.count }} новых сообщений</small>
             {% else %}
-            <span class="count-circle empty" aria-hidden="true">0</span>
+            <small>Нет новых уведомлений</small>
             {% endif %}
-        </a>
-        {% endfor %}
-    </div>
+        </span>
+        <span class="dashboard-arrow">›</span>
+    </a>
+    {% endfor %}
 </div>
+
+<section class="card last-notifications-card">
+    <div class="last-notifications-title">🕘&nbsp; Последние уведомления</div>
+    <div class="last-notifications-empty">
+        <div class="empty-bell">🔔</div>
+        <h3>У вас пока нет новых уведомлений</h3>
+        <p>Здесь будут отображаться последние сообщения и уведомления<br>из всех подключенных каналов.</p>
+    </div>
+</section>
 {% endblock %}
