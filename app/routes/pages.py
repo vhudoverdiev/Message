@@ -181,6 +181,43 @@ def toggle_message_read(message_id: int, db: Session = Depends(get_db), current_
     return RedirectResponse('/messages', status_code=303)
 
 
+@router.post('/messages/{message_id}/reply')
+def reply_to_message(
+    message_id: int,
+    reply_text: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    msg = db.query(ChannelMessage).filter(ChannelMessage.id == message_id, ChannelMessage.channel == 'vk').first()
+    if not msg:
+        return RedirectResponse('/messages', status_code=303)
+
+    account = db.query(ChannelAccount).filter(ChannelAccount.id == msg.account_id, ChannelAccount.channel == 'vk').first()
+    if not account:
+        write_log(
+            db,
+            action='VK_MESSAGE_REPLY_ERROR',
+            details=f'Не найден VK аккаунт для сообщения #{message_id}',
+            level='ERROR',
+            user_id=current_user.id,
+        )
+        return RedirectResponse('/messages', status_code=303)
+
+    ok, details = ChannelService(db).send_vk_reply(account, peer_id=msg.conversation_id, message=reply_text)
+    write_log(
+        db,
+        action='VK_MESSAGE_REPLY' if ok else 'VK_MESSAGE_REPLY_ERROR',
+        details=f'Сообщение #{message_id}: {details}',
+        level='INFO' if ok else 'ERROR',
+        user_id=current_user.id,
+    )
+    if ok:
+        msg.status = 'processed'
+        msg.is_read = True
+        db.commit()
+    return RedirectResponse('/messages', status_code=303)
+
+
 @router.get('/clients')
 def clients_page(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     clients = db.query(Client).order_by(Client.created_at.desc()).all()
