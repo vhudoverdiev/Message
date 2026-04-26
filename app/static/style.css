@@ -290,7 +290,13 @@ a { color: inherit; text-decoration: none; }
 .dashboard-stat-content small { color: var(--muted); font-size: 18px; }
 .dashboard-arrow { font-size: 28px; color: #93a0bf; }
 
-.card { padding: 0; }
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+}
 .last-notifications-card { min-height: 380px; }
 .last-notifications-title {
     padding: 18px 24px;
@@ -324,6 +330,70 @@ h3 { font-size: 17px; margin: 0 0 8px; }
     text-align: center;
     color: var(--muted);
     padding: 8px 0 2px;
+}
+
+.grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.kpi-card { display: grid; gap: 8px; }
+.kpi-title { font-size: 13px; color: var(--muted); }
+.kpi-value { font-size: 30px; font-weight: 700; line-height: 1; }
+.kpi-meta { font-size: 13px; }
+
+.btn.secondary {
+    background: var(--panel-muted);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.btn.danger {
+    background: rgba(255, 91, 109, .12);
+    color: #d4485b;
+    border-color: rgba(255, 91, 109, .28);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.badge.active,
+.badge.sla-ok,
+.badge.priority-low {
+    background: rgba(42, 184, 108, .12);
+    border-color: rgba(42, 184, 108, .25);
+    color: #1f8d53;
+}
+
+.badge.inactive {
+    background: rgba(159, 171, 197, .18);
+    border-color: rgba(159, 171, 197, .3);
+    color: #65718d;
+}
+
+.badge.pending,
+.badge.priority-medium {
+    background: rgba(255, 172, 41, .16);
+    border-color: rgba(255, 172, 41, .28);
+    color: #b06a12;
+}
+
+.badge.error,
+.badge.sla-risk,
+.badge.priority-high {
+    margin: 0;
+    background: rgba(255, 91, 109, .14);
+    border-color: rgba(255, 91, 109, .32);
+    color: #c23e51;
+    padding: 4px 10px;
 }
 
 .table-wrap { overflow: auto; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); }
@@ -368,4 +438,12 @@ select:focus-visible {
 @media (max-width: 1200px) {
     .app-shell { grid-template-columns: 230px 1fr; }
     .dashboard-stat-grid { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .sidebar { gap: 16px; }
+    .main { padding: 18px 14px; }
+    .grid-4 { grid-template-columns: 1fr; }
 }
