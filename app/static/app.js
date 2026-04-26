@@ -9,13 +9,12 @@ document.querySelectorAll('[data-confirm]').forEach((el) => {
 
 const THEME_STORAGE_KEY = 'crm-theme';
 const root = document.documentElement;
-const themeToggle = document.getElementById('theme-toggle');
+const themeToggle = document.getElementById('theme-toggle-switch');
 
 const applyTheme = (theme) => {
   root.setAttribute('data-theme', theme);
   if (themeToggle) {
-    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-    themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему');
+    themeToggle.checked = theme === 'dark';
   }
 };
 
@@ -30,9 +29,8 @@ const getInitialTheme = () => {
 applyTheme(getInitialTheme());
 
 if (themeToggle) {
-  themeToggle.addEventListener('click', () => {
-    const current = root.getAttribute('data-theme') || 'light';
-    const nextTheme = current === 'light' ? 'dark' : 'light';
+  themeToggle.addEventListener('change', () => {
+    const nextTheme = themeToggle.checked ? 'dark' : 'light';
     applyTheme(nextTheme);
     window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   });

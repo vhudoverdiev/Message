@@ -11,14 +11,14 @@
     <aside class="sidebar">
         <div>
             <div class="brand">
-                <span class="brand-logo" aria-hidden="true">↗</span>
+                <span class="brand-logo" aria-hidden="true">VK</span>
                 <span>VK CRM</span>
             </div>
             <nav class="menu">
                 <a href="/dashboard" class="{% if request.url.path in ['/', '/dashboard'] %}active{% endif %}"><span class="menu-icon">🔔</span>Уведомления</a>
                 <a href="/accounts" class="{% if '/accounts' in request.url.path %}active{% endif %}"><span class="menu-icon">vk</span>VK аккаунты</a>
                 <a href="/messages" class="{% if '/messages' in request.url.path %}active{% endif %}"><span class="menu-icon">💬</span>Сообщения</a>
-                <a href="/gmail" class="{% if '/gmail' in request.url.path %}active{% endif %}"><span class="menu-icon">✉️</span>Gmail</a>
+                <a href="/gmail" class="{% if '/gmail' in request.url.path %}active{% endif %}"><span class="menu-icon">✉</span>Gmail</a>
                 <a href="/telegram" class="{% if '/telegram' in request.url.path %}active{% endif %}"><span class="menu-icon">➤</span>Telegram</a>
                 <a href="/logs" class="{% if '/logs' in request.url.path %}active{% endif %}"><span class="menu-icon">🧾</span>Логи</a>
                 <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}"><span class="menu-icon">👥</span>Пользователи</a>
@@ -27,21 +27,25 @@
 
         <div class="sidebar-footer">
             <div class="account-panel">
-                <div class="account-avatar" aria-hidden="true">↗</div>
+                <div class="account-avatar" aria-hidden="true">Ж</div>
                 <div class="account-meta">
                     <strong>{{ current_user.full_name }}</strong>
-                    <div class="small">@{{ current_user.username }} • {{ current_user.role }}</div>
+                    <div class="small">@{{ current_user.username }} · {{ current_user.role }}</div>
                 </div>
             </div>
-            <div class="sidebar-footer-actions">
-                <form action="/logout" method="post" class="inline-form sidebar-logout-form">
-                    <button class="btn logout-btn" type="submit">⎋ Выйти</button>
-                </form>
-            </div>
+            <label class="theme-switch-row" for="theme-toggle-switch">
+                <span>Тёмная тема</span>
+                <input id="theme-toggle-switch" type="checkbox" class="theme-switch-input">
+                <span class="theme-switch-slider" aria-hidden="true"></span>
+            </label>
+            <form action="/logout" method="post" class="inline-form sidebar-logout-form">
+                <button class="btn logout-btn" type="submit">⎋ Выйти</button>
+            </form>
         </div>
     </aside>
     <main class="main">
         {% block content %}{% endblock %}
+        <footer class="main-footer">VK CRM v1.0.0 &nbsp;&nbsp;❤️&nbsp;&nbsp;Сделано с любовью</footer>
     </main>
 </div>
 <script src="/static/app.js?v={{ static_asset_version }}"></script>
