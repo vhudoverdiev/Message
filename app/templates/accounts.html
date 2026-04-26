@@ -7,7 +7,7 @@
         <li>Получите <b>community token</b> c правами на сообщения сообщества.</li>
         <li>Добавьте сообщество: название, ID сообщества и токен.</li>
         <li>Нажмите <b>Проверить токен</b> — система выполнит проверку через <code>groups.getById</code>.</li>
-        <li>Нажмите <b>Синхро диалогов</b> — система загрузит диалоги через <code>messages.getConversations</code>.</li>
+        <li>Синхронизация диалогов выполняется автоматически каждую секунду через <code>messages.getConversations</code>.</li>
     </ol>
     <p class="small">Личный VK user token в этом разделе не используется.</p>
 </div>
@@ -35,7 +35,6 @@
             <td>
                 <div class="row-actions">
                     <form method="post" action="/accounts/{{a.id}}/verify" class="inline-form"><button class="btn secondary">Проверить токен</button></form>
-                    <form method="post" action="/accounts/{{a.id}}/sync" class="inline-form"><button class="btn secondary">Синхро диалогов</button></form>
                     <details>
                         <summary>Редактировать</summary>
                         <form method="post" action="/accounts/{{a.id}}/update" class="form-grid">
