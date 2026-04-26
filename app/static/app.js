@@ -37,3 +37,12 @@ if (themeToggle) {
     window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
   });
 }
+
+document.querySelectorAll('.js-notification-tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    tab.classList.add('is-pressed');
+    window.setTimeout(() => {
+      tab.classList.remove('is-pressed');
+    }, 180);
+  });
+});
