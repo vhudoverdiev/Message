@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>Клиенты</h1>
+<div class="small">Этап 5 из 30 · карточка клиента 360° + таймлайн касаний.</div>
 <div class="card">
     <form method="post" action="/clients/create" class="form-grid">
         <label>Имя<input name="full_name" required></label>
@@ -26,7 +27,7 @@
 </div>
 <div class="card table-wrap">
     <table>
-        <thead><tr><th>Имя</th><th>VK</th><th>Теги</th><th>Статус</th><th>Менеджер</th><th>Заметки</th><th></th></tr></thead>
+        <thead><tr><th>Имя</th><th>VK</th><th>Теги</th><th>Статус</th><th>Менеджер</th><th>Заметки</th><th>Действия</th></tr></thead>
         <tbody>
         {% for c in clients %}
         <tr>
@@ -37,6 +38,7 @@
             <td>{{c.manager.full_name if c.manager else '-'}}</td>
             <td>{{c.notes}}</td>
             <td>
+                <a href="/clients/{{c.id}}" class="btn secondary">Карточка 360°</a>
                 <form method="post" action="/clients/{{c.id}}/delete" data-confirm="Удалить клиента?" class="inline-form">
                     <button class="btn danger">Удалить</button>
                 </form>

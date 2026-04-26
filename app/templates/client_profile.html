@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Клиент 360°</h1>
+<div class="card">
+    <div class="grid-3">
+        <div>
+            <div class="small">Клиент</div>
+            <div><b>{{ client.full_name }}</b></div>
+        </div>
+        <div>
+            <div class="small">Статус</div>
+            <div><span class="badge {% if client.status=='new' %}new{% elif client.status=='done' %}done{% else %}work{% endif %}">{{ client.status }}</span></div>
+        </div>
+        <div>
+            <div class="small">Ответственный</div>
+            <div>{{ client.manager.full_name if client.manager else 'Не назначен' }}</div>
+        </div>
+    </div>
+    <p class="small" style="margin-top:10px;">VK: <a href="{{ client.vk_link }}" target="_blank">{{ client.vk_link }}</a> · user_id: {{ client.vk_user_id or '—' }}</p>
+    <p>{{ client.notes or 'Заметки отсутствуют.' }}</p>
+    <a href="/clients" class="btn secondary">← К списку клиентов</a>
+</div>
+
+<div class="card">
+    <h3>Таймлайн касаний</h3>
+    <div class="timeline">
+        {% for item in timeline %}
+        <article class="timeline-item">
+            <div class="timeline-meta">
+                <span class="small">{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                <span class="badge {% if item.source == 'unified' %}active{% elif item.source == 'legacy' %}inactive{% else %}new{% endif %}">
+                    {{ item.source }}
+                </span>
+                {% if item.priority %}
+                <span class="badge priority-{{ item.priority }}">{{ item.priority }}</span>
+                {% endif %}
+                {% if item.is_read is defined %}
+                <span class="badge {{ 'done' if item.is_read else 'work' }}">{{ 'read' if item.is_read else 'unread' }}</span>
+                {% endif %}
+            </div>
+            <h4>{{ item.title }}</h4>
+            <p>{{ item.body or '—' }}</p>
+            {% if item.conversation_id %}
+            <div class="small">Диалог: {{ item.conversation_id }}</div>
+            {% endif %}
+        </article>
+        {% else %}
+        <p class="small">История касаний пока пуста.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
