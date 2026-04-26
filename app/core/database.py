@@ -87,7 +87,7 @@ def seed_demo_data() -> None:
 
         if not db.query(Setting).first():
             db.add_all([
-                Setting(group_name='system', key='crm_name', value='VK CRM Pro'),
+                Setting(group_name='system', key='crm_name', value='VK CRM'),
                 Setting(group_name='notifications', key='email_enabled', value='false'),
                 Setting(group_name='crm', key='default_timezone', value='UTC'),
             ])

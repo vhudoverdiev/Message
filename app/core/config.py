@@ -19,7 +19,7 @@ def _as_int(name: str, default: int) -> int:
 
 @dataclass(frozen=True)
 class Settings:
-    app_name: str = os.getenv('APP_NAME', 'VK CRM Pro')
+    app_name: str = os.getenv('APP_NAME', 'VK CRM')
     secret_key: str = os.getenv('SECRET_KEY', 'change_me')
     database_url: str = os.getenv('DATABASE_URL', 'sqlite:///./crm.db')
     admin_username: str = os.getenv('ADMIN_USERNAME', 'admin')

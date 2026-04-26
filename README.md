@@ -1,4 +1,4 @@
-# Omni-Channel CRM (Gmail + Telegram + VK)
+# VK CRM (Gmail + Telegram + VK)
 
 Production-ready foundation CRM на **FastAPI + SQLAlchemy + Jinja2** с модульной архитектурой каналов.
 
@@ -39,7 +39,7 @@ uvicorn app.main:app --reload
 
 ## Настройки .env
 ```env
-APP_NAME=Omni-Channel CRM
+APP_NAME=VK CRM
 SECRET_KEY=change_me_to_long_random_value
 DATABASE_URL=sqlite:///./crm.db
 ADMIN_USERNAME=admin
