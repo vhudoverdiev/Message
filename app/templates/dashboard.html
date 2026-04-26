@@ -1,24 +1,80 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Dashboard</h1>
+<section class="page-header">
+    <h1>CRM Evolution · Wave 1</h1>
+    <p>Запускаем большой апгрейд продукта: более премиальный UX/UI, умная логика и измеримый рост эффективности команды.</p>
+    <div class="roadmap-pill">Этап 1 из 30 · Дизайн-система + дашборд нового поколения</div>
+</section>
+
 <div class="grid-4">
-    <div class="card"><div class="kpi-title">VK аккаунты</div><div class="kpi-value">{{ stats.accounts }}</div></div>
-    <div class="card"><div class="kpi-title">Новые сообщения</div><div class="kpi-value">{{ stats.new_messages }}</div></div>
-    <div class="card"><div class="kpi-title">Клиенты</div><div class="kpi-value">{{ stats.clients }}</div></div>
-    <div class="card"><div class="kpi-title">Активные диалоги</div><div class="kpi-value">{{ stats.dialogs }}</div></div>
+    <div class="card kpi-card">
+        <div class="kpi-title">VK аккаунты</div>
+        <div class="kpi-value">{{ stats.accounts }}</div>
+        <div class="kpi-meta">Подключены к единому inbox</div>
+    </div>
+    <div class="card kpi-card">
+        <div class="kpi-title">Новые сообщения</div>
+        <div class="kpi-value">{{ stats.new_messages }}</div>
+        <div class="kpi-meta">Необработанные лиды и обращения</div>
+    </div>
+    <div class="card kpi-card">
+        <div class="kpi-title">Клиенты</div>
+        <div class="kpi-value">{{ stats.clients }}</div>
+        <div class="kpi-meta">Контакты в воронке</div>
+    </div>
+    <div class="card kpi-card">
+        <div class="kpi-title">Активные диалоги</div>
+        <div class="kpi-value">{{ stats.dialogs }}</div>
+        <div class="kpi-meta">Диалоги с живыми задачами</div>
+    </div>
 </div>
+
 <div class="grid-2">
     <div class="card">
-        <h3>Быстрый старт (этап 15, личный аккаунт)</h3>
-        <ol>
-            <li>Откройте страницу «VK аккаунты» и добавьте один аккаунт вручную.</li>
-            <li>Вставьте <b>user token</b> (без VK ID OAuth).</li>
-            <li>Нажмите «Проверить токен», затем «Синхро диалогов».</li>
+        <h3>Этап 1 (уже внедрено в этом релизе)</h3>
+        <ol class="roadmap-list">
+            <li>Создан визуальный фундамент: стеклянные карточки, мягкие тени, градиенты, единый ритм отступов.</li>
+            <li>Обновлена иерархия дашборда: фокус на KPI + понятные подписи с бизнес-смыслом.</li>
+            <li>Добавлена продуктовая шапка «Wave 1», чтобы зафиксировать текущий этап развития CRM.</li>
+            <li>Подготовлены UI-компоненты для дальнейших этапов (progress bar, premium cards, roadmap-паттерны).</li>
         </ol>
+        <div class="progress-track" aria-label="Прогресс дорожной карты"><span style="width: 3.33%"></span></div>
+        <p class="small">Прогресс: 1 / 30 этапов (3.33%).</p>
     </div>
     <div class="card">
-        <h3>Статус</h3>
-        <p>Сервис уже использует рабочую схему user token: проверка через <code>users.get</code> и синхронизация через <code>messages.getConversations</code>.</p>
+        <h3>Дорожная карта улучшений (30 этапов)</h3>
+        <ol class="roadmap-list">
+            <li><b>Visual Foundation 2.0</b> — premium UI-kit, обновлённый дашборд и дизайн-система.</li>
+            <li>Глобальная типографика и токены темы (Light/Dark + брендинг).</li>
+            <li>Умный глобальный поиск (клиенты, сообщения, сделки).</li>
+            <li>Inbox 2.0 с фильтрами по приоритету и SLA.</li>
+            <li>Карточка клиента 360° с таймлайном касаний.</li>
+            <li>Сегментация клиентской базы (теги, статусы, score).</li>
+            <li>Pipeline сделок с drag-and-drop стадиями.</li>
+            <li>Автоматические правила маршрутизации лидов.</li>
+            <li>Шаблоны сообщений + AI-подсказки ответов.</li>
+            <li>Авто-назначение ответственных по нагрузке.</li>
+            <li>SLA-таймеры и оповещения о риске просрочки.</li>
+            <li>Финальный activity feed по всем каналам.</li>
+            <li>Единый центр задач и follow-up напоминаний.</li>
+            <li>Улучшенный модуль ролей и прав доступа.</li>
+            <li>Журнал аудита действий сотрудников.</li>
+            <li>Продвинутая аналитика конверсии воронки.</li>
+            <li>Когортный анализ и retention-метрики.</li>
+            <li>Финансовая аналитика (LTV, CAC, ROMI).</li>
+            <li>Интеграции с телефонией и email-трекером.</li>
+            <li>Webhook framework и API для внешних сервисов.</li>
+            <li>Конструктор автоматизаций (if/then сценарии).</li>
+            <li>A/B тестирование шаблонов коммуникаций.</li>
+            <li>Умный календарь встреч и загрузки менеджеров.</li>
+            <li>Мобильная адаптация и PWA-режим.</li>
+            <li>Performance-оптимизация (кэш, lazy loading).</li>
+            <li>Feature flags и безопасные релизные циклы.</li>
+            <li>Инструменты качества данных и дедупликации.</li>
+            <li>NPS/CSAT-опросы и контроль качества сервиса.</li>
+            <li>Self-service портал для клиентов.</li>
+            <li>Финальный polishing: micro-interactions и UX-мелочи уровня enterprise.</li>
+        </ol>
     </div>
 </div>
 {% endblock %}
