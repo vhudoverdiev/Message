@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Gmail</h1>
+<div class="grid-2">
+  <div class="card">
+    <h3>Подключение Gmail</h3>
+    <form method="post" action="/gmail/connect" class="form-grid">
+      <label>Название <input name="name" value="Corporate Gmail" required></label>
+      <label>Email/alias <input name="email" value="me"></label>
+      <label class="full">OAuth Access Token <input name="access_token" placeholder="ya29..." required></label>
+      <button class="btn full">Подключить</button>
+    </form>
+    <form method="post" action="/gmail/sync" class="form-grid" style="margin-top:10px;">
+      <label>Gmail Query <input name="q" placeholder="from:client@example.com OR is:unread"></label>
+      <button class="btn full">Обновить письма</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Текущий аккаунт</h3>
+    {% if account %}
+      <p><b>{{ account.name }}</b></p>
+      <p class="small">ID: {{ account.external_id }} • Статус: {{ account.status }}</p>
+    {% else %}
+      <p>Аккаунт не подключен.</p>
+    {% endif %}
+  </div>
+</div>
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Дата</th><th>Отправитель</th><th>Тема</th><th>Статус</th><th>Полный текст</th></tr></thead>
+    <tbody>
+      {% for m in messages %}
+      <tr>
+        <td>{{ m.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ m.sender_name }}</td>
+        <td>{{ m.subject }}</td>
+        <td><span class="badge {{ 'done' if m.is_read else 'new' }}">{{ 'Прочитано' if m.is_read else 'Непрочитано' }}</span></td>
+        <td><details><summary>Открыть</summary><pre>{{ m.body_full }}</pre></details></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">Писем пока нет.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

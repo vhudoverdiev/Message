@@ -8,6 +8,8 @@ from app.core.config import settings
 from app.models import base, user
 from app.models.client import Client
 from app.models.setting import Setting
+from app.models.channel_account import ChannelAccount
+from app.models.channel_message import ChannelMessage
 from app.services.auth_service import hash_password
 
 is_sqlite = settings.database_url.startswith('sqlite')
@@ -85,9 +87,16 @@ def seed_demo_data() -> None:
 
         if not db.query(Setting).first():
             db.add_all([
-                Setting(group_name='system', key='crm_name', value='VK CRM Pro'),
+                Setting(group_name='system', key='crm_name', value='VK CRM'),
                 Setting(group_name='notifications', key='email_enabled', value='false'),
                 Setting(group_name='crm', key='default_timezone', value='UTC'),
+            ])
+
+        if not db.query(ChannelAccount).first():
+            db.add_all([
+                ChannelAccount(channel='gmail', name='Primary Gmail', external_id='me', status='inactive'),
+                ChannelAccount(channel='telegram', name='Main Telegram Bot', external_id='', status='inactive'),
+                ChannelAccount(channel='vk', name='VK Community', external_id='', status='inactive'),
             ])
 
         db.commit()

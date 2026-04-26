@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Telegram</h1>
+<div class="grid-2">
+  <div class="card">
+    <h3>Подключение Telegram Bot API</h3>
+    <form method="post" action="/telegram/connect" class="form-grid">
+      <label>Название <input name="name" value="Support Bot" required></label>
+      <label>Bot username <input name="bot_username" placeholder="@company_support_bot"></label>
+      <label class="full">Bot token <input name="bot_token" placeholder="123456:AA..." required></label>
+      <button class="btn full">Подключить</button>
+    </form>
+    <form method="post" action="/telegram/sync" style="margin-top:10px;">
+      <button class="btn">Загрузить уведомления</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Статус канала</h3>
+    {% if account %}
+      <p><b>{{ account.name }}</b></p>
+      <p class="small">{{ account.external_id }} • {{ account.status }}</p>
+    {% else %}
+      <p>Канал Telegram не подключен.</p>
+    {% endif %}
+  </div>
+</div>
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Дата</th><th>Отправитель</th><th>Текст</th><th>Статус</th><th>Действие</th></tr></thead>
+    <tbody>
+    {% for m in messages %}
+      <tr>
+        <td>{{ m.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ m.sender_name }}</td>
+        <td>{{ m.body_preview }}</td>
+        <td><span class="badge {{ 'done' if m.status == 'processed' else 'new' }}">{{ m.status }}</span></td>
+        <td>
+          <form method="post" action="/telegram/messages/{{m.id}}/status" class="inline-form">
+            <input type="hidden" name="status" value="processed">
+            <button class="btn secondary">Пометить обработанным</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">Уведомлений пока нет.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

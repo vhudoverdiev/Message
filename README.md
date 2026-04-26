@@ -1,21 +1,30 @@
-# VK CRM Pro
+# VK CRM (Gmail + Telegram + VK)
 
-Готовая CRM-система на **FastAPI + SQLAlchemy + Jinja2** для работы с несколькими VK-аккаунтами в одном интерфейсе.
+Production-ready foundation CRM на **FastAPI + SQLAlchemy + Jinja2** с модульной архитектурой каналов.
 
-## Стек
-- Backend: FastAPI, SQLAlchemy ORM, Session auth
-- DB: SQLite по умолчанию (легко переключается на PostgreSQL через `DATABASE_URL`)
-- Frontend: Jinja2 + HTML + CSS + JS
+## Что реализовано
+- Отдельные вкладки: **Gmail**, **Telegram**, **VK Hub**.
+- Подключение каналов через безопасное хранение токенов в БД (шифрование на основе `SECRET_KEY`).
+- Синхронизация входящих данных:
+  - Gmail: список писем, отправитель, тема, дата, read/unread, просмотр полного текста, поиск/refresh.
+  - Telegram (Bot API): входящие уведомления, отправитель, текст, дата, статус обработки.
+  - VK Community: список диалогов/сообщений, статусы (new/in_progress/processed), ответ в диалог из CRM.
+- Логирование всех действий и ошибок синхронизации.
+- Модульная база для расширения каналов (WhatsApp/Instagram/Avito и т.д.).
 
-## Возможности
-- Авторизация по логину/паролю
-- Роли: `admin`, `manager`
-- Страницы: Dashboard, VK аккаунты, Сообщения, Клиенты, Логи, Настройки, Пользователи
-- CRUD для VK аккаунтов и клиентов
-- Единая таблица сообщений по всем аккаунтам + фильтрация/поиск
-- Логи действий пользователей
-- Сервисный слой для интеграции с VK API (`app/services/vk_service.py`)
-- Этап 15: ручное подключение **1 личного VK аккаунта** через user token
+## Рекомендуемый стек и почему
+- **FastAPI** — быстрый API/web слой, удобен для async-интеграций и микросервисного роста.
+- **SQLAlchemy 2.x** — строгая ORM-модель, миграционный путь к PostgreSQL.
+- **Jinja2 + server-side rendering** — простой и надежный admin UI без перегрузки фронтендом.
+- **SQLite (dev) / PostgreSQL (prod)** — быстрый старт + готовый путь к production.
+- **.env + SECRET_KEY** — централизованная конфигурация и защита секретов.
+
+## Архитектура
+- `app/routes` — HTTP-роуты и UI endpoints.
+- `app/services/channel_service.py` — бизнес-логика интеграции каналов (Gmail/Telegram/VK).
+- `app/models/channel_account.py` — подключенные каналы и токены.
+- `app/models/channel_message.py` — унифицированное хранилище сообщений каналов.
+- `app/core/security.py` — шифрование/дешифрование токенов.
 
 ## Запуск
 ```bash
@@ -26,61 +35,20 @@ cp .env.example .env
 uvicorn app.main:app --reload
 ```
 
-Альтернатива (теперь поддерживается):
-```bash
-python run.py
-```
-
 Откройте: `http://127.0.0.1:8000`
 
-## Почему не запускается (`python run.py`)
-Если видите ошибку `can't open file ... run.py: [Errno 2] No such file or directory`, значит в проекте не было `run.py`.
-
-Теперь доступны оба варианта запуска:
-1. `python run.py`
-2. `uvicorn app.main:app --reload`
-
-Для Windows PowerShell:
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-Copy-Item .env.example .env
-python run.py
-```
-
-## Данные доступа
-- login: `admin`
-- password: `admin123`
-
-## Переключение на PostgreSQL
-В `.env`:
+## Настройки .env
 ```env
-DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/vk_crm
-STATIC_ASSET_VERSION=1
+APP_NAME=VK CRM
+SECRET_KEY=change_me_to_long_random_value
+DATABASE_URL=sqlite:///./crm.db
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
 ```
 
-Если после деплоя вы видите старые стили/JS, увеличьте `STATIC_ASSET_VERSION` (например, `2`) и перезапустите сервис — это принудительно обновит кэш статических файлов в браузере.
+## Подключение каналов
+1. Войдите как администратор.
+2. Перейдите на вкладки `Gmail`, `Telegram`, `VK Hub`.
+3. Укажите токены интеграций и выполните синхронизацию.
 
-## Этап 15: как подключить личный аккаунт (manual user token)
-1. Войдите в CRM под `admin`.
-2. Откройте страницу **VK аккаунты**.
-3. Добавьте один аккаунт и вставьте `user token` вручную.
-4. Нажмите **Проверить токен** (вызов `users.get`).
-5. Нажмите **Синхро диалогов** (вызов `messages.getConversations`).
-
-> В этой схеме VK ID OAuth не используется.
-
-## Где расширять VK интеграцию
-- `app/services/vk_service.py`
-  - `validate_connection` — проверка user token через VK API
-  - `sync_dialogs` — синхронизация диалогов личного аккаунта
-  - `long_poll_config_map` — маппинг параметров группы
-
-## Архитектура
-- `app/routes` — маршруты и страницы
-- `app/models` — ORM модели
-- `app/services` — бизнес-логика и интеграции
-- `app/core` — конфиг, база, логирование
-- `app/templates` — шаблоны интерфейса
-- `app/static` — стили и JS
+> В этой версии Gmail использует уже полученный OAuth Access Token, Telegram — Bot Token, VK — API token сообщества.

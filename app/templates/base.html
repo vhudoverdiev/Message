@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>{{ title or 'VK CRM Pro' }}</title>
+    <title>{{ title or 'VK CRM' }}</title>
     <link rel="stylesheet" href="/static/style.css?v={{ static_asset_version }}">
 </head>
 <body>
 <div class="app-shell">
     <aside class="sidebar">
-        <div class="brand">VK CRM Pro</div>
+        <div class="brand">VK CRM</div>
         <nav class="menu">
-            <a href="/dashboard" class="{% if request.url.path == '/dashboard' %}active{% endif %}">Dashboard</a>
-            <a href="/accounts" class="{% if '/accounts' in request.url.path %}active{% endif %}">VK аккаунты</a>
-            <a href="/messages" class="{% if '/messages' in request.url.path %}active{% endif %}">Сообщения</a>
-            <a href="/clients" class="{% if '/clients' in request.url.path %}active{% endif %}">Клиенты</a>
+            <a href="/gmail" class="{% if '/gmail' in request.url.path %}active{% endif %}">Gmail</a>
+            <a href="/telegram" class="{% if '/telegram' in request.url.path %}active{% endif %}">Telegram</a>
+            <a href="/vk-hub" class="{% if '/vk-hub' in request.url.path %}active{% endif %}">VK Hub</a>
             <a href="/logs" class="{% if '/logs' in request.url.path %}active{% endif %}">Логи</a>
-            <a href="/settings" class="{% if '/settings' in request.url.path %}active{% endif %}">Настройки</a>
             <a href="/users" class="{% if '/users' in request.url.path %}active{% endif %}">Пользователи</a>
         </nav>
     </aside>

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>VK Community Hub</h1>
+<div class="grid-2">
+  <div class="card">
+    <h3>Подключение сообщества VK</h3>
+    <form method="post" action="/vk-hub/connect" class="form-grid">
+      <label>Название <input name="name" value="VK Sales Community" required></label>
+      <label>ID сообщества <input name="group_id" placeholder="club123"></label>
+      <label class="full">VK API token <input name="access_token" required></label>
+      <button class="btn full">Подключить</button>
+    </form>
+    <form method="post" action="/vk-hub/sync" style="margin-top:10px;">
+      <button class="btn">Синхронизировать диалоги</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Ответ на сообщение</h3>
+    <form method="post" action="/vk-hub/reply" class="form-grid">
+      <label>peer_id <input name="peer_id" required></label>
+      <label class="full">Текст ответа<textarea name="message" required></textarea></label>
+      <button class="btn full">Отправить в VK</button>
+    </form>
+  </div>
+</div>
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Дата</th><th>Диалог</th><th>Отправитель</th><th>Сообщение</th><th>Статус</th></tr></thead>
+    <tbody>
+      {% for d in dialogs %}
+      <tr>
+        <td>{{ d.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ d.conversation_id }}</td>
+        <td>{{ d.sender_name }}</td>
+        <td>{{ d.body_preview }}</td>
+        <td>
+          <form method="post" action="/vk-hub/messages/{{d.id}}/status" class="inline-form">
+            <select name="status">
+              <option value="new" {% if d.status == 'new' %}selected{% endif %}>new</option>
+              <option value="in_progress" {% if d.status == 'in_progress' %}selected{% endif %}>in_progress</option>
+              <option value="processed" {% if d.status == 'processed' %}selected{% endif %}>processed</option>
+            </select>
+            <button class="btn secondary" style="margin-top:6px;">Сохранить</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">Диалогов пока нет.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
