@@ -12,10 +12,13 @@ from app.models.message import Message
 from app.models.setting import Setting
 from app.models.user import User
 from app.models.vk_account import VKAccount
+from app.models.channel_account import ChannelAccount
+from app.models.channel_message import ChannelMessage
 from app.routes.deps import get_current_user, require_admin
 from app.services.dashboard_service import get_dashboard_stats
 from app.services.log_service import write_log
 from app.services.vk_service import VKService
+from app.services.channel_service import ChannelService
 
 router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
@@ -289,3 +292,162 @@ def save_setting(
     db.commit()
     write_log(db, action='SETTING_SAVE', details=f'Сохранен параметр {key}', user_id=current_user.id)
     return RedirectResponse('/settings', status_code=303)
+
+
+@router.get('/gmail')
+def gmail_page(
+    request: Request,
+    q: str = Query(default=''),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    service = ChannelService(db)
+    accounts = service.list_accounts('gmail')
+    account = accounts[0] if accounts else None
+    query = db.query(ChannelMessage).filter(ChannelMessage.channel == 'gmail').order_by(ChannelMessage.created_at.desc())
+    if account:
+        query = query.filter(ChannelMessage.account_id == account.id)
+    if q:
+        query = query.filter(or_(ChannelMessage.subject.ilike(f'%{q}%'), ChannelMessage.body_preview.ilike(f'%{q}%')))
+    messages = query.limit(100).all()
+    return templates.TemplateResponse('gmail.html', {'request': request, 'messages': messages, 'account': account, 'q': q, 'current_user': current_user})
+
+
+@router.post('/gmail/connect')
+def gmail_connect(
+    name: str = Form(...),
+    email: str = Form('me'),
+    access_token: str = Form(''),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    ChannelService(db).upsert_account('gmail', None, name=name, external_id=email, token=access_token)
+    write_log(db, action='GMAIL_CONNECT', details=f'Подключен Gmail: {email}', user_id=current_user.id)
+    return RedirectResponse('/gmail', status_code=303)
+
+
+@router.post('/gmail/sync')
+def gmail_sync(
+    q: str = Form(''),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    account = db.query(ChannelAccount).filter(ChannelAccount.channel == 'gmail').order_by(ChannelAccount.created_at.desc()).first()
+    if not account:
+        return RedirectResponse('/gmail', status_code=303)
+    ok, details = ChannelService(db).sync_gmail(account, q)
+    write_log(db, action='GMAIL_SYNC' if ok else 'GMAIL_SYNC_ERROR', details=details, level='INFO' if ok else 'ERROR', user_id=current_user.id)
+    return RedirectResponse('/gmail', status_code=303)
+
+
+@router.get('/telegram')
+def telegram_page(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    service = ChannelService(db)
+    accounts = service.list_accounts('telegram')
+    account = accounts[0] if accounts else None
+    query = db.query(ChannelMessage).filter(ChannelMessage.channel == 'telegram').order_by(ChannelMessage.created_at.desc())
+    if account:
+        query = query.filter(ChannelMessage.account_id == account.id)
+    messages = query.limit(150).all()
+    return templates.TemplateResponse('telegram.html', {'request': request, 'messages': messages, 'account': account, 'current_user': current_user})
+
+
+@router.post('/telegram/connect')
+def telegram_connect(
+    name: str = Form(...),
+    bot_username: str = Form(''),
+    bot_token: str = Form(''),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    ChannelService(db).upsert_account('telegram', None, name=name, external_id=bot_username, token=bot_token)
+    write_log(db, action='TELEGRAM_CONNECT', details=f'Подключен Telegram bot: {bot_username}', user_id=current_user.id)
+    return RedirectResponse('/telegram', status_code=303)
+
+
+@router.post('/telegram/sync')
+def telegram_sync(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    account = db.query(ChannelAccount).filter(ChannelAccount.channel == 'telegram').order_by(ChannelAccount.created_at.desc()).first()
+    if not account:
+        return RedirectResponse('/telegram', status_code=303)
+    ok, details = ChannelService(db).sync_telegram(account)
+    write_log(db, action='TELEGRAM_SYNC' if ok else 'TELEGRAM_SYNC_ERROR', details=details, level='INFO' if ok else 'ERROR', user_id=current_user.id)
+    return RedirectResponse('/telegram', status_code=303)
+
+
+@router.post('/telegram/messages/{message_id}/status')
+def telegram_mark_status(
+    message_id: int,
+    status: str = Form('processed'),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    msg = db.query(ChannelMessage).filter(ChannelMessage.id == message_id, ChannelMessage.channel == 'telegram').first()
+    if msg:
+        msg.status = status
+        msg.is_read = status == 'processed'
+        db.commit()
+        write_log(db, action='TELEGRAM_STATUS', details=f'Message #{message_id} -> {status}', user_id=current_user.id)
+    return RedirectResponse('/telegram', status_code=303)
+
+
+@router.get('/vk-hub')
+def vk_hub_page(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    service = ChannelService(db)
+    accounts = service.list_accounts('vk')
+    account = accounts[0] if accounts else None
+    dialogs = db.query(ChannelMessage).filter(ChannelMessage.channel == 'vk').order_by(ChannelMessage.created_at.desc()).limit(200).all()
+    return templates.TemplateResponse('vk_hub.html', {'request': request, 'dialogs': dialogs, 'account': account, 'current_user': current_user})
+
+
+@router.post('/vk-hub/connect')
+def vk_hub_connect(
+    name: str = Form(...),
+    group_id: str = Form(''),
+    access_token: str = Form(''),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    ChannelService(db).upsert_account('vk', None, name=name, external_id=group_id, token=access_token)
+    write_log(db, action='VK_COMMUNITY_CONNECT', details=f'Подключено VK сообщество: {group_id}', user_id=current_user.id)
+    return RedirectResponse('/vk-hub', status_code=303)
+
+
+@router.post('/vk-hub/sync')
+def vk_hub_sync(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    account = db.query(ChannelAccount).filter(ChannelAccount.channel == 'vk').order_by(ChannelAccount.created_at.desc()).first()
+    if not account:
+        return RedirectResponse('/vk-hub', status_code=303)
+    ok, details = ChannelService(db).sync_vk(account)
+    write_log(db, action='VK_COMMUNITY_SYNC' if ok else 'VK_COMMUNITY_SYNC_ERROR', details=details, level='INFO' if ok else 'ERROR', user_id=current_user.id)
+    return RedirectResponse('/vk-hub', status_code=303)
+
+
+@router.post('/vk-hub/reply')
+def vk_hub_reply(
+    peer_id: str = Form(...),
+    message: str = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    account = db.query(ChannelAccount).filter(ChannelAccount.channel == 'vk').order_by(ChannelAccount.created_at.desc()).first()
+    if not account:
+        return RedirectResponse('/vk-hub', status_code=303)
+    ok, details = ChannelService(db).send_vk_reply(account, peer_id=peer_id, message=message)
+    write_log(db, action='VK_COMMUNITY_REPLY' if ok else 'VK_COMMUNITY_REPLY_ERROR', details=details, level='INFO' if ok else 'ERROR', user_id=current_user.id)
+    return RedirectResponse('/vk-hub', status_code=303)
+
+
+@router.post('/vk-hub/messages/{message_id}/status')
+def vk_hub_set_status(
+    message_id: int,
+    status: str = Form('in_progress'),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    msg = db.query(ChannelMessage).filter(ChannelMessage.id == message_id, ChannelMessage.channel == 'vk').first()
+    if msg:
+        msg.status = status
+        db.commit()
+        write_log(db, action='VK_HUB_STATUS', details=f'VK message #{message_id} -> {status}', user_id=current_user.id)
+    return RedirectResponse('/vk-hub', status_code=303)
