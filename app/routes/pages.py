@@ -25,6 +25,11 @@ templates = Jinja2Templates(directory='app/templates')
 templates.env.globals['static_asset_version'] = settings.static_asset_version
 
 
+@router.get('/')
+def root():
+    return RedirectResponse('/dashboard', status_code=303)
+
+
 @router.get('/dashboard')
 def dashboard(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     stats = get_dashboard_stats(db)
