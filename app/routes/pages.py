@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from fastapi import APIRouter, Depends, Form, Query, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -8,16 +10,13 @@ from app.core.database import get_db
 from app.core.config import settings
 from app.models.client import Client
 from app.models.log_entry import LogEntry
-from app.models.message import Message
 from app.models.setting import Setting
 from app.models.user import User
-from app.models.vk_account import VKAccount
 from app.models.channel_account import ChannelAccount
 from app.models.channel_message import ChannelMessage
 from app.routes.deps import get_current_user, require_admin
 from app.services.dashboard_service import get_dashboard_stats
 from app.services.log_service import write_log
-from app.services.vk_service import VKService
 from app.services.channel_service import ChannelService
 
 router = APIRouter()
@@ -38,7 +37,7 @@ def dashboard(request: Request, db: Session = Depends(get_db), current_user: Use
 
 @router.get('/accounts')
 def accounts_page(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    accounts = db.query(VKAccount).order_by(VKAccount.created_at.desc()).all()
+    accounts = ChannelService(db).list_accounts('vk')
     return templates.TemplateResponse('accounts.html', {'request': request, 'accounts': accounts, 'current_user': current_user})
 
 
@@ -47,49 +46,26 @@ def create_account(
     request: Request,
     name: str = Form(...),
     group_id: str = Form(...),
-    status: str = Form('active'),
     access_token: str = Form(''),
-    long_poll_server: str = Form(''),
-    long_poll_key: str = Form(''),
-    long_poll_ts: str = Form(''),
-    description: str = Form(''),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    if db.query(VKAccount).count() >= 1:
-        write_log(db, action='VK_ACCOUNT_CREATE_BLOCKED', details='Разрешен только один личный VK аккаунт', level='WARNING', user_id=current_user.id)
-        return RedirectResponse('/accounts', status_code=303)
-
-    account = VKAccount(
-        name=name,
-        group_id=group_id,
-        status=status,
-        access_token=access_token,
-        long_poll_server=long_poll_server,
-        long_poll_key=long_poll_key,
-        long_poll_ts=long_poll_ts,
-        description=description,
-        owner_id=current_user.id,
-    )
-    db.add(account)
-    db.commit()
-    write_log(db, action='VK_ACCOUNT_CREATE', details=f'Создан VK аккаунт {name}', user_id=current_user.id)
+    service = ChannelService(db)
+    account = service.create_vk_account(name=name, group_id=group_id, access_token=access_token)
+    write_log(db, action='VK_COMMUNITY_CREATE', details=f'Создано VK сообщество {account.name}', user_id=current_user.id)
     return RedirectResponse('/accounts', status_code=303)
 
 
 @router.post('/accounts/{account_id}/verify')
 def verify_account_token(account_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    account = db.query(VKAccount).filter(VKAccount.id == account_id).first()
+    account = db.query(ChannelAccount).filter(ChannelAccount.id == account_id, ChannelAccount.channel == 'vk').first()
     if not account:
         return RedirectResponse('/accounts', status_code=303)
 
-    vk_service = VKService(db)
-    is_ok, status_text = vk_service.validate_connection(account)
-    account.status = 'active' if is_ok else 'error'
-    log_action = 'VK_TOKEN_VERIFY' if is_ok else 'VK_TOKEN_VERIFY_ERROR'
+    is_ok, status_text = ChannelService(db).verify_vk_account(account)
+    log_action = 'VK_COMMUNITY_VERIFY' if is_ok else 'VK_COMMUNITY_VERIFY_ERROR'
     log_level = 'INFO' if is_ok else 'ERROR'
     write_log(db, action=log_action, details=f'{account.name}: {status_text}', level=log_level, user_id=current_user.id)
-    db.commit()
     return RedirectResponse('/accounts', status_code=303)
 
 
@@ -98,69 +74,39 @@ def update_account(
     account_id: int,
     name: str = Form(...),
     group_id: str = Form(...),
-    status: str = Form('active'),
     access_token: str = Form(''),
-    long_poll_server: str = Form(''),
-    long_poll_key: str = Form(''),
-    long_poll_ts: str = Form(''),
-    description: str = Form(''),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    account = db.query(VKAccount).filter(VKAccount.id == account_id).first()
+    account = db.query(ChannelAccount).filter(ChannelAccount.id == account_id, ChannelAccount.channel == 'vk').first()
     if not account:
         return RedirectResponse('/accounts', status_code=303)
-    account.name = name
-    account.group_id = group_id
-    account.status = status
-    account.access_token = access_token
-    account.long_poll_server = long_poll_server
-    account.long_poll_key = long_poll_key
-    account.long_poll_ts = long_poll_ts
-    account.description = description
-    db.commit()
-    write_log(db, action='VK_ACCOUNT_UPDATE', details=f'Обновлен VK аккаунт {name}', user_id=current_user.id)
+    ChannelService(db).update_vk_account(account, name=name, group_id=group_id, access_token=access_token)
+    write_log(db, action='VK_COMMUNITY_UPDATE', details=f'Обновлено VK сообщество {name}', user_id=current_user.id)
     return RedirectResponse('/accounts', status_code=303)
 
 
 @router.post('/accounts/{account_id}/delete')
 def delete_account(account_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_admin)):
-    account = db.query(VKAccount).filter(VKAccount.id == account_id).first()
+    account = db.query(ChannelAccount).filter(ChannelAccount.id == account_id, ChannelAccount.channel == 'vk').first()
     if account:
-        db.delete(account)
-        db.commit()
-        write_log(db, action='VK_ACCOUNT_DELETE', details=f'Удален VK аккаунт #{account_id}', user_id=current_user.id)
+        ChannelService(db).delete_vk_account(account)
+        write_log(db, action='VK_COMMUNITY_DELETE', details=f'Удалено VK сообщество #{account_id}', user_id=current_user.id)
     return RedirectResponse('/accounts', status_code=303)
 
 
 @router.post('/accounts/{account_id}/sync')
 def sync_account(account_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    account = db.query(VKAccount).filter(VKAccount.id == account_id).first()
+    account = db.query(ChannelAccount).filter(ChannelAccount.id == account_id, ChannelAccount.channel == 'vk').first()
     if account:
-        vk_service = VKService(db)
-        is_ok, status_text = vk_service.validate_connection(account)
-        if is_ok:
-            sync_ok, _, sync_text = vk_service.sync_dialogs(account)
-            account.status = 'active' if sync_ok else 'error'
-            if sync_ok:
-                write_log(
-                    db,
-                    action='VK_SYNC',
-                    details=f'{account.name}: {sync_text}',
-                    user_id=current_user.id,
-                )
-            else:
-                write_log(
-                    db,
-                    action='VK_SYNC_ERROR',
-                    details=f'{account.name}: {sync_text}',
-                    level='ERROR',
-                    user_id=current_user.id,
-                )
-        else:
-            account.status = 'error'
-            write_log(db, action='VK_SYNC_ERROR', details=f'{account.name}: {status_text}', level='ERROR', user_id=current_user.id)
-        db.commit()
+        ok, details = ChannelService(db).sync_vk_account(account)
+        write_log(
+            db,
+            action='VK_COMMUNITY_SYNC' if ok else 'VK_COMMUNITY_SYNC_ERROR',
+            details=f'{account.name}: {details}',
+            level='INFO' if ok else 'ERROR',
+            user_id=current_user.id,
+        )
     return RedirectResponse('/accounts', status_code=303)
 
 
@@ -169,29 +115,68 @@ def messages_page(
     request: Request,
     account_id: int | None = Query(default=None),
     q: str = Query(default=''),
+    priority: str = Query(default=''),
+    sla_only: str = Query(default='0'),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    query = db.query(Message).order_by(Message.sent_at.desc())
+    query = db.query(ChannelMessage).filter(ChannelMessage.channel == 'vk').order_by(ChannelMessage.created_at.desc())
     if account_id:
-        query = query.filter(Message.vk_account_id == account_id)
+        query = query.filter(ChannelMessage.account_id == account_id)
     if q:
-        query = query.filter(Message.text.ilike(f'%{q}%'))
-    messages = query.limit(300).all()
-    accounts = db.query(VKAccount).order_by(VKAccount.name.asc()).all()
+        query = query.filter(or_(ChannelMessage.body_preview.ilike(f'%{q}%'), ChannelMessage.sender_name.ilike(f'%{q}%')))
+    messages = query.limit(500).all()
+
+    now = datetime.utcnow()
+    enriched_messages = []
+    for message in messages:
+        message_priority = ChannelService.classify_vk_priority(message.body_preview)
+        is_sla_risk = (not message.is_read) and ((now - message.created_at) > timedelta(hours=2))
+        if priority and message_priority != priority:
+            continue
+        if sla_only == '1' and not is_sla_risk:
+            continue
+        enriched_messages.append({
+            'item': message,
+            'priority': message_priority,
+            'is_sla_risk': is_sla_risk,
+        })
+
+    base_query = db.query(ChannelMessage).filter(ChannelMessage.channel == 'vk')
+    if account_id:
+        base_query = base_query.filter(ChannelMessage.account_id == account_id)
+    unread_count = base_query.filter(ChannelMessage.is_read.is_(False)).count()
+    total_count = base_query.count()
+    high_priority_count = sum(1 for row in enriched_messages if row['priority'] == 'high')
+    sla_risk_count = sum(1 for row in enriched_messages if row['is_sla_risk'])
+    accounts = db.query(ChannelAccount).filter(ChannelAccount.channel == 'vk').order_by(ChannelAccount.name.asc()).all()
     return templates.TemplateResponse(
         'messages.html',
-        {'request': request, 'messages': messages, 'accounts': accounts, 'account_id': account_id, 'q': q, 'current_user': current_user},
+        {
+            'request': request,
+            'messages': enriched_messages,
+            'accounts': accounts,
+            'account_id': account_id,
+            'q': q,
+            'priority': priority,
+            'sla_only': sla_only,
+            'unread_count': unread_count,
+            'total_count': total_count,
+            'high_priority_count': high_priority_count,
+            'sla_risk_count': sla_risk_count,
+            'current_user': current_user,
+        },
     )
 
 
 @router.post('/messages/{message_id}/toggle-read')
 def toggle_message_read(message_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    msg = db.query(Message).filter(Message.id == message_id).first()
+    msg = db.query(ChannelMessage).filter(ChannelMessage.id == message_id, ChannelMessage.channel == 'vk').first()
     if msg:
         msg.is_read = not msg.is_read
+        msg.status = 'processed' if msg.is_read else 'new'
         db.commit()
-        write_log(db, action='MESSAGE_STATUS', details=f'Message {message_id} read={msg.is_read}', user_id=current_user.id)
+        write_log(db, action='VK_MESSAGE_STATUS', details=f'VK Message {message_id} read={msg.is_read}', user_id=current_user.id)
     return RedirectResponse('/messages', status_code=303)
 
 
