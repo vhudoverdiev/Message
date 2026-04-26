@@ -57,7 +57,7 @@
 </div>
 <div class="card table-wrap">
     <table>
-        <thead><tr><th>Время</th><th>Аккаунт</th><th>Диалог</th><th>Отправитель</th><th>Текст</th><th>Приоритет</th><th>SLA</th><th>Статус</th></tr></thead>
+        <thead><tr><th>Время</th><th>Аккаунт</th><th>Диалог</th><th>Отправитель</th><th>Текст</th><th>Приоритет</th><th>SLA</th><th>Статус</th><th>Ответ</th></tr></thead>
         <tbody>
         {% for m in messages %}
         <tr>
@@ -76,9 +76,15 @@
                     <button class="btn secondary">{{ 'Прочитано' if m.item.is_read else 'Непрочитано' }}</button>
                 </form>
             </td>
+            <td>
+                <form method="post" action="/messages/{{m.item.id}}/reply" class="inline-form">
+                    <input name="reply_text" placeholder="Написать ответ..." required>
+                    <button class="btn">Отправить</button>
+                </form>
+            </td>
         </tr>
         {% else %}
-        <tr><td colspan="8">Сообщений пока нет.</td></tr>
+        <tr><td colspan="9">Сообщений пока нет.</td></tr>
         {% endfor %}
         </tbody>
     </table>
