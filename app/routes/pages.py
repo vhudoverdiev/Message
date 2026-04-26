@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.config import settings
 from app.models.client import Client
+from app.models.message import Message
 from app.models.log_entry import LogEntry
 from app.models.setting import Setting
 from app.models.user import User
@@ -185,6 +186,62 @@ def clients_page(request: Request, db: Session = Depends(get_db), current_user: 
     clients = db.query(Client).order_by(Client.created_at.desc()).all()
     managers = db.query(User).filter(User.is_active.is_(True)).order_by(User.full_name.asc()).all()
     return templates.TemplateResponse('clients.html', {'request': request, 'clients': clients, 'managers': managers, 'current_user': current_user})
+
+
+@router.get('/clients/{client_id}')
+def client_profile_page(client_id: int, request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    client = db.query(Client).filter(Client.id == client_id).first()
+    if not client:
+        return RedirectResponse('/clients', status_code=303)
+
+    legacy_messages = db.query(Message).filter(Message.client_id == client.id).order_by(Message.sent_at.desc()).limit(100).all()
+    channel_query = db.query(ChannelMessage).filter(ChannelMessage.channel == 'vk')
+    if client.vk_user_id:
+        channel_query = channel_query.filter(
+            or_(
+                ChannelMessage.conversation_id.ilike(f'%{client.vk_user_id}%'),
+                ChannelMessage.sender_name.ilike(f'%{client.vk_user_id}%'),
+            )
+        )
+    unified_messages = channel_query.order_by(ChannelMessage.created_at.desc()).limit(100).all()
+
+    timeline = [
+        {
+            'source': 'client',
+            'title': 'Карточка создана',
+            'body': f'Клиент добавлен в CRM со статусом {client.status}',
+            'created_at': client.created_at,
+        }
+    ]
+    for msg in legacy_messages:
+        timeline.append({
+            'source': 'legacy',
+            'title': 'Legacy VK сообщение',
+            'body': msg.text,
+            'created_at': msg.sent_at,
+            'is_read': msg.is_read,
+        })
+    for msg in unified_messages:
+        timeline.append({
+            'source': 'unified',
+            'title': f'VK Inbox · {msg.sender_name or "Unknown"}',
+            'body': msg.body_preview,
+            'created_at': msg.created_at,
+            'is_read': msg.is_read,
+            'priority': ChannelService.classify_vk_priority(msg.body_preview),
+            'conversation_id': msg.conversation_id,
+        })
+    timeline.sort(key=lambda row: row['created_at'], reverse=True)
+
+    return templates.TemplateResponse(
+        'client_profile.html',
+        {
+            'request': request,
+            'client': client,
+            'timeline': timeline[:200],
+            'current_user': current_user,
+        },
+    )
 
 
 @router.post('/clients/create')
